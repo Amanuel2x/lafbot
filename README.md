@@ -1,5 +1,5 @@
 <p align="center">
-  <img src="assets/lafbot-banner.jpg" alt="lafbot — Learn Anything Fast" width="600">
+  <img src="assets/lafbot-banner.jpg" alt="lafbot — Learn Anything Fast" width="240">
 </p>
 
 # lafbot — Learn Anything Fast
