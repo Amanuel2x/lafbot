@@ -7,7 +7,7 @@
 > Multi-agent YouTube research pipeline for Claude Code. Pick any topic, walk away 30 minutes later with a knowledge-graph-style HTML report + Obsidian vault notes synthesized from 60+ videos and their viewer comments.
 
 <p align="center">
-  <a href="https://github.com/Amanuel2x/lafbot/actions/workflows/ci.yml"><img src="https://github.com/Amanuel2x/lafbot/actions/workflows/ci.yml/badge.svg" alt="CI"></a>
+  <a href="https://github.com/Amanuel2x/learn-anything-fast/actions/workflows/ci.yml"><img src="https://github.com/Amanuel2x/learn-anything-fast/actions/workflows/ci.yml/badge.svg" alt="CI"></a>
   <a href="https://opensource.org/licenses/MIT"><img src="https://img.shields.io/badge/License-MIT-yellow.svg" alt="License: MIT"></a>
   <a href="https://claude.com/claude-code"><img src="https://img.shields.io/badge/Claude%20Code-Skill-7c3aed" alt="Claude Code Skill"></a>
 </p>
@@ -49,7 +49,7 @@ Before you can run lafbot, you need:
 ## Install
 
 ```bash
-git clone https://github.com/Amanuel2x/lafbot.git
+git clone https://github.com/Amanuel2x/learn-anything-fast.git
 cd lafbot
 ./install.sh
 ```
