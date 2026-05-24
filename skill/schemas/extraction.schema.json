@@ -1,0 +1,32 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "ExtractionVideo",
+  "type": "object",
+  "required": ["videoId"],
+  "properties": {
+    "videoId": { "type": "string", "minLength": 5 },
+    "title": { "type": ["string", "null"] },
+    "channel": { "type": ["string", "null"] },
+    "url": { "type": ["string", "null"] },
+    "skipped": { "type": "boolean" },
+    "skip_reason": { "type": ["string", "null"] },
+    "tactics": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["text", "source", "stage", "category", "confidence", "quote"],
+        "properties": {
+          "text": { "type": "string", "minLength": 3 },
+          "source": { "enum": ["creator", "commenter"] },
+          "stage": { "type": "string" },
+          "category": { "type": "string" },
+          "confidence": { "enum": ["high", "medium", "low"] },
+          "claim_type": {
+            "enum": ["actionable", "data-point", "framing", "warning", "story", null]
+          },
+          "quote": { "type": "string" }
+        }
+      }
+    }
+  }
+}

@@ -1,0 +1,1005 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>SaaS Marketing Research — Example — 2026-05-24</title>
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+<script src="https://unpkg.com/vis-network@9.1.9/standalone/umd/vis-network.min.js"></script>
+<style>
+:root {
+  --bg: #0a0a0a;
+  --bg-elev: #141414;
+  --bg-elev-2: #1c1c1c;
+  --border: #2a2a2a;
+  --text: #e7e7e7;
+  --text-muted: #888;
+  --accent: #7c3aed;
+  --accent-2: #06b6d4;
+  --good: #10b981;
+  --warn: #f59e0b;
+  --danger: #ef4444;
+}
+@media (prefers-color-scheme: light) {
+  :root {
+    --bg: #fafafa;
+    --bg-elev: #fff;
+    --bg-elev-2: #f4f4f4;
+    --border: #e5e5e5;
+    --text: #18181b;
+    --text-muted: #71717a;
+  }
+}
+* { box-sizing: border-box; }
+html, body { margin: 0; padding: 0; }
+body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: -apple-system, BlinkMacSystemFont, "Inter", "Segoe UI", sans-serif;
+  line-height: 1.6;
+  font-size: 15px;
+}
+.container { max-width: 1200px; margin: 0 auto; padding: 40px 24px; }
+header {
+  border-bottom: 1px solid var(--border);
+  padding-bottom: 24px;
+  margin-bottom: 32px;
+}
+h1 { font-size: 32px; margin: 0 0 8px; font-weight: 700; }
+h2 { font-size: 22px; margin: 48px 0 16px; font-weight: 600; border-bottom: 1px solid var(--border); padding-bottom: 8px; }
+h3 { font-size: 17px; margin: 24px 0 8px; font-weight: 600; }
+.meta-bar {
+  display: flex;
+  gap: 24px;
+  flex-wrap: wrap;
+  margin-top: 12px;
+  color: var(--text-muted);
+  font-size: 13px;
+}
+.meta-bar span strong { color: var(--text); font-weight: 600; }
+.tldr {
+  background: var(--bg-elev);
+  border: 1px solid var(--border);
+  border-left: 3px solid var(--accent);
+  padding: 20px 24px;
+  border-radius: 8px;
+  margin-bottom: 32px;
+}
+.tldr h2 { margin-top: 0; border: none; padding: 0; }
+.tldr-finding {
+  margin: 16px 0;
+  padding-left: 24px;
+  position: relative;
+}
+.tldr-finding::before {
+  content: "→";
+  position: absolute;
+  left: 0;
+  color: var(--accent);
+  font-weight: 700;
+}
+.tldr-finding strong { color: var(--text); display: block; margin-bottom: 4px; }
+.tldr-finding span { color: var(--text-muted); font-size: 14px; }
+.card {
+  background: var(--bg-elev);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 20px;
+  margin: 16px 0;
+}
+.tactic-card {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+.tactic-card .name { font-weight: 600; color: var(--text); font-size: 15px; }
+.tactic-card .quote {
+  color: var(--text-muted);
+  font-style: italic;
+  font-size: 14px;
+  border-left: 2px solid var(--border);
+  padding-left: 12px;
+  margin: 6px 0;
+}
+.tactic-card .source { font-size: 12px; color: var(--text-muted); }
+.tactic-card .source a { color: var(--accent-2); text-decoration: none; }
+.tactic-card .source a:hover { text-decoration: underline; }
+.badges { display: flex; gap: 6px; flex-wrap: wrap; }
+.badge {
+  display: inline-block;
+  padding: 2px 8px;
+  border-radius: 4px;
+  font-size: 11px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.3px;
+  background: var(--bg-elev-2);
+  color: var(--text-muted);
+  border: 1px solid var(--border);
+}
+.badge.category { color: white; border-color: transparent; }
+.badge.stage { background: var(--bg-elev-2); }
+.badge.bucket-consensus { background: #064e3b; color: #d1fae5; }
+.badge.bucket-anomaly { background: #7c2d12; color: #fed7aa; }
+.badge.bucket-emerging { background: #1e3a8a; color: #dbeafe; }
+.badge.bucket-commenter-only { background: #7c2d12; color: #fed7aa; }
+.badge.source-commenter { background: #581c87; color: #f3e8ff; }
+.grid-2 { display: grid; grid-template-columns: repeat(auto-fit, minmax(420px, 1fr)); gap: 16px; }
+.chart-container {
+  background: var(--bg-elev);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 20px;
+  position: relative;
+  height: 720px;
+}
+.network-container {
+  background: var(--bg-elev);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 0;
+  height: 600px;
+  overflow: hidden;
+}
+#network { width: 100%; height: 600px; }
+.contradiction {
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  margin: 16px 0;
+  overflow: hidden;
+}
+.contradiction-header {
+  background: var(--bg-elev-2);
+  padding: 12px 20px;
+  font-weight: 600;
+  border-bottom: 1px solid var(--border);
+}
+.contradiction-sides {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0;
+}
+.side { padding: 16px 20px; }
+.side.a { border-right: 1px solid var(--border); background: rgba(59, 130, 246, 0.05); }
+.side.b { background: rgba(239, 68, 68, 0.05); }
+.side h4 { margin: 0 0 8px; font-size: 13px; text-transform: uppercase; letter-spacing: 0.5px; color: var(--text-muted); }
+.side p { margin: 4px 0; font-size: 14px; }
+.side .creators { font-size: 12px; color: var(--text-muted); margin-top: 8px; }
+.resolution {
+  background: var(--bg-elev-2);
+  padding: 12px 20px;
+  border-top: 1px solid var(--border);
+  font-size: 14px;
+}
+.resolution strong { color: var(--accent); }
+details {
+  background: var(--bg-elev);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 12px 16px;
+  margin: 8px 0;
+}
+details summary {
+  cursor: pointer;
+  font-weight: 600;
+  padding: 4px 0;
+  user-select: none;
+}
+details[open] summary { margin-bottom: 12px; }
+.method-list { font-size: 13px; color: var(--text-muted); }
+.method-list a { color: var(--accent-2); text-decoration: none; }
+.method-list a:hover { text-decoration: underline; }
+.toc {
+  background: var(--bg-elev);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 16px 24px;
+  margin-bottom: 32px;
+}
+.toc a {
+  display: inline-block;
+  margin-right: 12px;
+  color: var(--accent-2);
+  text-decoration: none;
+  font-size: 14px;
+}
+.toc a:hover { text-decoration: underline; }
+.stage-section {
+  background: var(--bg-elev);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 0;
+  margin-bottom: 12px;
+  overflow: hidden;
+}
+.stage-section summary {
+  padding: 16px 20px;
+  background: var(--bg-elev-2);
+  font-size: 17px;
+}
+.stage-section .stage-body { padding: 16px 20px; }
+@media (max-width: 720px) {
+  .container { padding: 20px 14px; }
+  .grid-2 { grid-template-columns: 1fr; }
+  .contradiction-sides { grid-template-columns: 1fr; }
+  .side.a { border-right: none; border-bottom: 1px solid var(--border); }
+  h1 { font-size: 24px; }
+  h2 { font-size: 18px; }
+}
+</style>
+</head>
+<body>
+<div class="container">
+  <header>
+    <h1>SaaS Marketing Research — Example</h1>
+    <div style="color:var(--text-muted); font-size:14px;">B2B SaaS marketing playbook — Idea → MVP → Beta → V1 → Revenue</div>
+    <div class="meta-bar">
+      <span>Date: <strong>2026-05-24</strong></span>
+      <span>Videos analyzed: <strong>63</strong></span>
+      <span>Channels: <strong>49</strong></span>
+      <span>Raw tactics extracted: <strong>620</strong></span>
+      <span>Canonical tactics: <strong>69</strong></span>
+      <span>Commenter insights: <strong>33</strong></span>
+    </div>
+  </header>
+
+  <nav class="toc">
+    <a href="#tldr">TLDR</a>
+    <a href="#frequency">Frequency</a>
+    <a href="#network">Network Graph</a>
+    <a href="#anomalies">Anomalies</a>
+    <a href="#from-comments">From the Comments</a>
+    <a href="#contradictions">Contradictions</a>
+    <a href="#playbook">Per-Stage Playbook</a>
+    <a href="#diversity">Source Diversity</a>
+    <a href="#methodology">Methodology</a>
+  </nav>
+
+  <section class="tldr" id="tldr">
+    <h2>TLDR — 7 findings, leading with the most surprising</h2>
+    <div class="tldr-finding"><strong>Distribution is the real moat — not the product</strong><span>8 creators AND 5 commenters independently said this. The product is 1% of the job; getting it in front of people is 99%. Bootstrappers have a 7-year survival rate of ~55% vs <5% for VC-backed competitors — the difference is distribution discipline, not capital.</span></div>
+    <div class="tldr-finding"><strong>Build in public is now table-stakes, not edge</strong><span>7 distinct creators say build-in-public flips your failure rate from 90% → 10%. RB2B went $0 → $1M ARR in 6 weeks on LinkedIn alone. The anomaly is that most founders STILL won't post daily — that's the actual gap, not 'finding the right channel.'</span></div>
+    <div class="tldr-finding"><strong>Cold email still works — but only with infrastructure most founders skip</strong><span>10 creators recommend it, but the working version requires: domain rotation (3-5 lookalike domains, 2 inboxes each), warm-up, sender pool, AND personalized hooks. Naked Gmail-to-Gmail cold email at 50/day is a known dead path — reply rates are now 3.4% (down from 8.5% in 2019).</span></div>
+    <div class="tldr-finding"><strong>Loom video DMs jump cold response rate from 5% → 20-30%</strong><span>Mentioned by only 2 creators and 1 commenter (Rok Bercic, Adam Robinson). This is anomaly territory — most founders never try video DMs. 4-6x lift over plain-text outreach. Hardest to scale, biggest leverage at low volume.</span></div>
+    <div class="tldr-finding"><strong>The 'stop doing X' framing beats 'AI-powered Y' messaging</strong><span>Commenter insight on Greg Isenberg's video: 'Tradespeople don't want AI software, they want to stop writing quotes at 9pm.' Frame value as what the customer can stop suffering, not the technology you built. Concrete pain > sexy capability.</span></div>
+    <div class="tldr-finding"><strong>Community-led growth beats both content and ads for B2B retention</strong><span>13 creators cite community as a top-3 channel. AllDayDevOps grew 0 → 13,000 members in 90 days with 2.5 part-time staff and zero vendor pitches. Slack groups and private Discords compound monthly; ads decay weekly.</span></div>
+    <div class="tldr-finding"><strong>AI search (ChatGPT/Perplexity referrals) is a real, underused channel</strong><span>Anomaly tactic — only 1 creator named it (Sam Dunning) but cited a 45K B2B lead from a single ChatGPT referral. Webflow data: LLM-referred users convert 6x higher than search-referred users. Most founders aren't even tracking this source yet.</span></div>
+  </section>
+
+  <section id="frequency">
+    <h2>What everyone is saying — top 20 tactics by creator count</h2>
+    <p style="color:var(--text-muted)">Each bar is a tactic. Length = number of distinct creators who recommended it. Color = category. Stacked secondary segment = how many commenters independently endorsed it (orange = strong commenter validation).</p>
+    <div class="chart-container">
+      <canvas id="frequencyChart"></canvas>
+    </div>
+  </section>
+
+  <section id="network">
+    <h2>Knowledge graph — how tactics cluster</h2>
+    <p style="color:var(--text-muted)">Nodes are tactics. Edges connect tactics that appear together in 3+ videos. Node size = mentions. Hover for details. Drag nodes to untangle clusters.</p>
+    <div class="network-container">
+      <div id="network"></div>
+    </div>
+  </section>
+
+  <section id="anomalies">
+    <h2>Anomaly tactics — what most founders aren't talking about</h2>
+    <p style="color:var(--text-muted)">Mentioned by only 1-2 creators (or only by commenters). These are the highest-leverage edges — fewer people are doing them, so the competition for attention is thinner.</p>
+    <div class="grid-2">
+    <div class="card tactic-card">
+      <div class="badges">
+        <span class="badge category" style="background:#06b6d4">growth-loops</span>
+        <span class="badge stage">MVP</span>
+        <span class="badge bucket-anomaly">anomaly</span>
+        <span class="badge source-commenter">commenter-source</span>
+      </div>
+      <div class="name">Lead Magnet Opt In</div>
+      <div class="quote">"you don't get into how you setup the organic social tests (don't have a social media marketing background)"</div>
+      <div class="source">— TK Kader · <a href="https://youtube.com/watch?v=AkdiTRGFc18" target="_blank">How To Create a Go To Market Strategy (2026 Playbook)</a></div>
+    </div>
+    <div class="card tactic-card">
+      <div class="badges">
+        <span class="badge category" style="background:#ec4899">ads</span>
+        <span class="badge stage">V1 / Launch</span>
+        <span class="badge bucket-anomaly">anomaly</span>
+        <span class="badge source-commenter">commenter-source</span>
+      </div>
+      <div class="name">Linkedin Ads</div>
+      <div class="quote">"the gap between knowing what to do and having the team capacity to execute it cleanly is where most B2B growth plans quietly fall apart"</div>
+      <div class="source">— Ben B2B · <a href="https://youtube.com/watch?v=tLggx01ICSA" target="_blank">11 Best B2B Marketing Strategies for 2026</a></div>
+    </div>
+    <div class="card tactic-card">
+      <div class="badges">
+        <span class="badge category" style="background:#f97316">social-proof</span>
+        <span class="badge stage">V1 / Launch</span>
+        <span class="badge bucket-anomaly">anomaly</span>
+        <span class="badge source-commenter">commenter-source</span>
+      </div>
+      <div class="name">Review Sites G2</div>
+      <div class="quote">"Love the idea - pick a successful product and solve the problems people are complaining about them and try to grab a small pie of it."</div>
+      <div class="source">— Starter Story · <a href="https://youtube.com/watch?v=67zh8_yiPh4" target="_blank">I Built 3 SaaS Apps to $200K MRR</a></div>
+    </div>
+    <div class="card tactic-card">
+      <div class="badges">
+        <span class="badge category" style="background:#ef4444">cold-outbound</span>
+        <span class="badge stage">Beta</span>
+        <span class="badge bucket-anomaly">anomaly</span>
+        <span class="badge source-commenter">commenter-source</span>
+      </div>
+      <div class="name">Loom Video Outreach</div>
+      <div class="quote">"We just launched our first SaaS and started the outreach to our network. We will now for sure look into personalized loom videos"</div>
+      <div class="source">— Dekker the Marketer · <a href="https://youtube.com/watch?v=jsK118WxNaw" target="_blank">Top 7 SaaS Marketing Strategies</a></div>
+    </div>
+    <div class="card tactic-card">
+      <div class="badges">
+        <span class="badge category" style="background:#ef4444">cold-outbound</span>
+        <span class="badge stage">V1 / Launch</span>
+        <span class="badge bucket-anomaly">anomaly</span>
+        
+      </div>
+      <div class="name">Visitor Identification</div>
+      <div class="quote">"we manually sent spreadsheets over email for five full months before we even put up a website — staying manual kept us close to customers"</div>
+      <div class="source">— Adam Robinson · <a href="https://youtube.com/watch?v=r47Q4Cfit5s" target="_blank">If I Started a SaaS in 2026, I'd Do This (0 to 1,000+ Users)</a></div>
+    </div>
+    <div class="card tactic-card">
+      <div class="badges">
+        <span class="badge category" style="background:#6366f1">validation</span>
+        <span class="badge stage">Idea</span>
+        <span class="badge bucket-anomaly">anomaly</span>
+        
+      </div>
+      <div class="name">Interview Customers</div>
+      <div class="quote">"commit to 50 discovery calls minimum — find people who will pay for something you haven't built yet. Actual prepayment, not just 'yeah that sounds interesting'"</div>
+      <div class="source">— Adam Robinson · <a href="https://youtube.com/watch?v=r47Q4Cfit5s" target="_blank">If I Started a SaaS in 2026, I'd Do This (0 to 1,000+ Users)</a></div>
+    </div>
+    <div class="card tactic-card">
+      <div class="badges">
+        <span class="badge category" style="background:#06b6d4">growth-loops</span>
+        <span class="badge stage">V1 / Launch</span>
+        <span class="badge bucket-anomaly">anomaly</span>
+        
+      </div>
+      <div class="name">Freemium</div>
+      <div class="quote">"freemium in itself doesn't inherently include distribution — don't confuse freemium with virality"</div>
+      <div class="source">— Oren Greenberg · <a href="https://youtube.com/watch?v=vlv15nEH-zk" target="_blank">The Best SaaS Marketing Strategy in 2025</a></div>
+    </div>
+    <div class="card tactic-card">
+      <div class="badges">
+        <span class="badge category" style="background:#10b981">community</span>
+        <span class="badge stage">Beta</span>
+        <span class="badge bucket-anomaly">anomaly</span>
+        
+      </div>
+      <div class="name">Events Conferences</div>
+      <div class="quote">"That event and community went from zero to 13,000 in the first 90 days because there were so many people thirsting for that knowledge."</div>
+      <div class="source">— TA Monroe Digital · <a href="https://youtube.com/watch?v=_7y5l2D9zRc" target="_blank">How Community-Led Marketing Drives B2B SaaS Growth</a></div>
+    </div>
+    <div class="card tactic-card">
+      <div class="badges">
+        <span class="badge category" style="background:#eab308">launches</span>
+        <span class="badge stage">Beta</span>
+        <span class="badge bucket-anomaly">anomaly</span>
+        
+      </div>
+      <div class="name">Product Hunt Launch</div>
+      <div class="quote">"There are dozens of other websites. Those websites are going to mention my website and improve the rating of my domain, which is useful for SEO. That's a nice bonus from launching on directories."</div>
+      <div class="source">— Andrew Zacker · <a href="https://youtube.com/watch?v=zwUu8SV40hE" target="_blank">I launched a SaaS in 7 days while working full-time</a></div>
+    </div>
+    <div class="card tactic-card">
+      <div class="badges">
+        <span class="badge category" style="background:#06b6d4">growth-loops</span>
+        <span class="badge stage">Beta</span>
+        <span class="badge bucket-anomaly">anomaly</span>
+        
+      </div>
+      <div class="name">Welcome Email Sequence</div>
+      <div class="quote">"a well-written five email welcome sequence can dramatically improve your conversion rate"</div>
+      <div class="source">— Brandon Burr · <a href="https://youtube.com/watch?v=4z3E0VojrGA" target="_blank">Best SaaS Marketing Strategies for 2026</a></div>
+    </div>
+    <div class="card tactic-card">
+      <div class="badges">
+        <span class="badge category" style="background:#ef4444">cold-outbound</span>
+        <span class="badge stage">V1 / Launch</span>
+        <span class="badge bucket-anomaly">anomaly</span>
+        
+      </div>
+      <div class="name">Direct Mail</div>
+      <div class="quote">"direct mail is a super touch point... 90% of direct mail campaigns drive a sale within 6 months"</div>
+      <div class="source">— Ben B2B · <a href="https://youtube.com/watch?v=tLggx01ICSA" target="_blank">11 Best B2B Marketing Strategies for 2026</a></div>
+    </div>
+    <div class="card tactic-card">
+      <div class="badges">
+        <span class="badge category" style="background:#ec4899">ads</span>
+        <span class="badge stage">V1 / Launch</span>
+        <span class="badge bucket-anomaly">anomaly</span>
+        
+      </div>
+      <div class="name">Bing Microsoft Ads</div>
+      <div class="quote">"Bing Ads have a much higher conversion rate. It's cheaper traffic. The demographic of people that seem to use it is super high"</div>
+      <div class="source">— Ben B2B · <a href="https://youtube.com/watch?v=tLggx01ICSA" target="_blank">11 Best B2B Marketing Strategies for 2026</a></div>
+    </div>
+    <div class="card tactic-card">
+      <div class="badges">
+        <span class="badge category" style="background:#06b6d4">growth-loops</span>
+        <span class="badge stage">MVP</span>
+        <span class="badge bucket-anomaly">anomaly</span>
+        
+      </div>
+      <div class="name">Open Source Release</div>
+      <div class="quote">"I decided to take my GitHub seriously, create a nice profile and release the open source part... I gained some stars on it which is always motivating"</div>
+      <div class="source">— pookie · <a href="https://youtube.com/watch?v=6tKxMJ10IuI" target="_blank">Why (almost) All of Indie Hacking is a Scam</a></div>
+    </div>
+    <div class="card tactic-card">
+      <div class="badges">
+        <span class="badge category" style="background:#84cc16">positioning</span>
+        <span class="badge stage">Revenue</span>
+        <span class="badge bucket-anomaly">anomaly</span>
+        
+      </div>
+      <div class="name">Data Moat</div>
+      <div class="quote">"you can resell the anonymized aggregate stats via an API — unique data that someone would buy. People are going to buy businesses just for their data"</div>
+      <div class="source">— Greg Isenberg · <a href="https://youtube.com/watch?v=ndqX4vbR7Rc" target="_blank">Making $$$ with MicroSaaS</a></div>
+    </div>
+    <div class="card tactic-card">
+      <div class="badges">
+        <span class="badge category" style="background:#10b981">community</span>
+        <span class="badge stage">V1 / Launch</span>
+        <span class="badge bucket-anomaly">anomaly</span>
+        
+      </div>
+      <div class="name">In Person Events Meetups</div>
+      <div class="quote">"clear data proving that communities with an in-person element have lower churn, higher retention, and higher engagement"</div>
+      <div class="source">— Tom Ross · <a href="https://youtube.com/watch?v=nEdGaVY7IK4" target="_blank">How to Build a Thriving Membership Community</a></div>
+    </div>
+    <div class="card tactic-card">
+      <div class="badges">
+        <span class="badge category" style="background:#a855f7">psychology</span>
+        <span class="badge stage">V1 / Launch</span>
+        <span class="badge bucket-anomaly">anomaly</span>
+        
+      </div>
+      <div class="name">Psychology Curiosity</div>
+      <div class="quote">"Start posting about it the week before, gaining momentum. Post on socials. Try to get friends and other people to post. Do a Product Hunt launch. Post on online communities like Reddit and other internet forums."</div>
+      <div class="source">— Chris Raroque · <a href="https://youtube.com/watch?v=MnF-zJhyUtE" target="_blank">Things I ALWAYS Do Before Launching New Apps</a></div>
+    </div>
+    <div class="card tactic-card">
+      <div class="badges">
+        <span class="badge category" style="background:#ec4899">ads</span>
+        <span class="badge stage">MVP</span>
+        <span class="badge bucket-anomaly">anomaly</span>
+        
+      </div>
+      <div class="name">User Generated Content</div>
+      <div class="quote">"Spent around $1,500 generating 4,000 downloads — that's 37 cents per download using the deals feature on Posted."</div>
+      <div class="source">— Steven Cravotta · <a href="https://youtube.com/watch?v=e_t1gYkvZkI" target="_blank">How To Reach 10,000 App Users (Beginner Marketing)</a></div>
+    </div>
+    <div class="card tactic-card">
+      <div class="badges">
+        <span class="badge category" style="background:#a855f7">psychology</span>
+        <span class="badge stage">Beta</span>
+        <span class="badge bucket-anomaly">anomaly</span>
+        <span class="badge source-commenter">commenter-source</span>
+      </div>
+      <div class="name">Psychology Exclusivity</div>
+      <div class="quote">"the video gave me the inspiration to finally build my micro SaaS idea — I've launched private beta and getting ready for public"</div>
+      <div class="source">— Greg Isenberg · <a href="https://youtube.com/watch?v=ndqX4vbR7Rc" target="_blank">Making $$$ with MicroSaaS</a></div>
+    </div>
+    <div class="card tactic-card">
+      <div class="badges">
+        <span class="badge category" style="background:#dc2626">sales</span>
+        <span class="badge stage">V1 / Launch</span>
+        <span class="badge bucket-anomaly">anomaly</span>
+        <span class="badge source-commenter">commenter-source</span>
+      </div>
+      <div class="name">Abm Account Based</div>
+      <div class="quote">"Can you make one for SaaS company that has 0 revenue, just starting?"</div>
+      <div class="source">— SaasRise · <a href="https://youtube.com/watch?v=iAI-htMWvBw" target="_blank">The Best SaaS Marketing Strategy for 2026</a></div>
+    </div>
+    <div class="card tactic-card">
+      <div class="badges">
+        <span class="badge category" style="background:#06b6d4">growth-loops</span>
+        <span class="badge stage">V1 / Launch</span>
+        <span class="badge bucket-anomaly">anomaly</span>
+        
+      </div>
+      <div class="name">Iteration Sprints</div>
+      <div class="quote">"you run it for a three week period, and if it works well, then you scale it. If it doesn't work, then you iterate on it and you run it again"</div>
+      <div class="source">— TK Kader · <a href="https://youtube.com/watch?v=RO2ifYXL5d0" target="_blank">Best SaaS Marketing Strategies For 2026</a></div>
+    </div>
+    <div class="card tactic-card">
+      <div class="badges">
+        <span class="badge category" style="background:#ec4899">ads</span>
+        <span class="badge stage">V1 / Launch</span>
+        <span class="badge bucket-anomaly">anomaly</span>
+        
+      </div>
+      <div class="name">Linkedin Creator Sponsorship</div>
+      <div class="quote">"companies with at least 2K average contract value — 2K can be challenging, around 3, 4, 5K it's a good start"</div>
+      <div class="source">— Favikon · <a href="https://youtube.com/watch?v=G54iqoOd8cc" target="_blank">The Most Underrated SaaS Marketing Strategy?</a></div>
+    </div>
+    <div class="card tactic-card">
+      <div class="badges">
+        <span class="badge category" style="background:#84cc16">positioning</span>
+        <span class="badge stage">Beta</span>
+        <span class="badge bucket-anomaly">anomaly</span>
+        
+      </div>
+      <div class="name">Channel Focus</div>
+      <div class="quote">"go deep on one to two channels. Don't scatter across 10. Pick the channels where your ideal users already spend their attention"</div>
+      <div class="source">— Brandon Burr · <a href="https://youtube.com/watch?v=4z3E0VojrGA" target="_blank">Best SaaS Marketing Strategies for 2026</a></div>
+    </div>
+    <div class="card tactic-card">
+      <div class="badges">
+        <span class="badge category" style="background:#dc2626">sales</span>
+        <span class="badge stage">MVP</span>
+        <span class="badge bucket-anomaly">anomaly</span>
+        
+      </div>
+      <div class="name">Delayed Billing Roi</div>
+      <div class="quote">"if someone's spending $100,000 a month on ads and losing $10,000... I say will you pay $500 a month for this? That's how that sales process works"</div>
+      <div class="source">— Alex Becker Tech · <a href="https://youtube.com/watch?v=EsgQ0bQzvZ0" target="_blank">How To Get 1,000 Paying SaaS Customer FAST From Scratch</a></div>
+    </div>
+    <div class="card tactic-card">
+      <div class="badges">
+        <span class="badge category" style="background:#a855f7">psychology</span>
+        <span class="badge stage">V1 / Launch</span>
+        <span class="badge bucket-anomaly">anomaly</span>
+        
+      </div>
+      <div class="name">Guarantee Risk Reversal</div>
+      <div class="quote">"hey, do you want this result? Here's like 50 businesses that've gotten this result. And if you don't get this result, we won't make you pay for it. Do you see how simple that is?"</div>
+      <div class="source">— Alex Becker Tech · <a href="https://youtube.com/watch?v=EsgQ0bQzvZ0" target="_blank">How To Get 1,000 Paying SaaS Customer FAST From Scratch</a></div>
+    </div>
+    </div>
+  </section>
+
+  <section id="from-comments">
+    <h2>From the comments — viewer insights creators didn't share</h2>
+    <p style="color:var(--text-muted)">Commenter-sourced tactics ranked by how many distinct videos surfaced them. These are real practitioners adding to or contradicting the creator's framing.</p>
+    <div class="grid-2">
+    <div class="card tactic-card">
+      <div class="badges">
+        <span class="badge category" style="background:#84cc16">positioning</span>
+        <span class="badge stage">Cross-stage</span>
+        <span class="badge source-commenter">5 commenter(s)</span>
+      </div>
+      <div class="name">Distribution First</div>
+      <div class="quote">"the reason you failed was probably geared more towards a marketing problem. Your ideas seem very fair and brilliant"</div>
+      <div class="source">— commenter on <a href="https://youtube.com/watch?v=6tKxMJ10IuI" target="_blank">Why (almost) All of Indie Hacking is a Scam</a> (pookie)</div>
+    </div>
+    <div class="card tactic-card">
+      <div class="badges">
+        <span class="badge category" style="background:#14b8a6">build-in-public</span>
+        <span class="badge stage">Cross-stage</span>
+        <span class="badge source-commenter">3 commenter(s)</span>
+      </div>
+      <div class="name">Founder Personal Brand</div>
+      <div class="quote">"Suppliers who share their expertise and industry insights tend to attract more inbound inquiries than those relying only on traditional brand visibility."</div>
+      <div class="source">— commenter on <a href="https://youtube.com/watch?v=bGjZzSY_-HQ" target="_blank">The New Rules of B2B Marketing 2026</a> (Leveling Up with Eric Siu)</div>
+    </div>
+    <div class="card tactic-card">
+      <div class="badges">
+        <span class="badge category" style="background:#3b82f6">seo</span>
+        <span class="badge stage">V1 / Launch</span>
+        <span class="badge source-commenter">2 commenter(s)</span>
+      </div>
+      <div class="name">Seo Content</div>
+      <div class="quote">"two weeks of calls beat all that — SAAGA Solve spent months on SEO experiments but two weeks of calls beat all that"</div>
+      <div class="source">— commenter on <a href="https://youtube.com/watch?v=r47Q4Cfit5s" target="_blank">If I Started a SaaS in 2026, I'd Do This (0 to 1,000+ Users)</a> (Adam Robinson)</div>
+    </div>
+    <div class="card tactic-card">
+      <div class="badges">
+        <span class="badge category" style="background:#eab308">launches</span>
+        <span class="badge stage">Idea</span>
+        <span class="badge source-commenter">2 commenter(s)</span>
+      </div>
+      <div class="name">Waitlist</div>
+      <div class="quote">"Does it make sense to make a waitlist if you don't have an audience? No visitors -> no signals."</div>
+      <div class="source">— commenter on <a href="https://youtube.com/watch?v=MnF-zJhyUtE" target="_blank">Things I ALWAYS Do Before Launching New Apps</a> (Chris Raroque)</div>
+    </div>
+    <div class="card tactic-card">
+      <div class="badges">
+        <span class="badge category" style="background:#6366f1">validation</span>
+        <span class="badge stage">Idea</span>
+        <span class="badge source-commenter">2 commenter(s)</span>
+      </div>
+      <div class="name">Pre Sell Validate</div>
+      <div class="quote">"If you can, get a financial commitment early. It's still not full proof, but you can avoid the unmotivated customers"</div>
+      <div class="source">— commenter on <a href="https://youtube.com/watch?v=Nuf1ThmVRcY" target="_blank">6 Signs Your SaaS MVP Is Not Good Enough</a> (Rob Walling)</div>
+    </div>
+    <div class="card tactic-card">
+      <div class="badges">
+        <span class="badge category" style="background:#f59e0b">content</span>
+        <span class="badge stage">Cross-stage</span>
+        <span class="badge source-commenter">1 commenter(s)</span>
+      </div>
+      <div class="name">Twitter X Organic</div>
+      <div class="quote">"ways of building an audience that don't start with 'get 25k Twitter followers' — building partnerships with resellers, service providers, coaches"</div>
+      <div class="source">— commenter on <a href="https://youtube.com/watch?v=ndqX4vbR7Rc" target="_blank">Making $$$ with MicroSaaS</a> (Greg Isenberg)</div>
+    </div>
+    <div class="card tactic-card">
+      <div class="badges">
+        <span class="badge category" style="background:#84cc16">positioning</span>
+        <span class="badge stage">Idea</span>
+        <span class="badge source-commenter">1 commenter(s)</span>
+      </div>
+      <div class="name">Anti Persona</div>
+      <div class="quote">"I've worked in a role for 5 years and am the target market — showed the MVP to a partner and he said it's the best thing to cross his desk in 35 years"</div>
+      <div class="source">— commenter on <a href="https://youtube.com/watch?v=r47Q4Cfit5s" target="_blank">If I Started a SaaS in 2026, I'd Do This (0 to 1,000+ Users)</a> (Adam Robinson)</div>
+    </div>
+    <div class="card tactic-card">
+      <div class="badges">
+        <span class="badge category" style="background:#f97316">social-proof</span>
+        <span class="badge stage">V1 / Launch</span>
+        <span class="badge source-commenter">1 commenter(s)</span>
+      </div>
+      <div class="name">Case Studies Testimonials</div>
+      <div class="quote">"at 500 users, just past $10,000 in sales excited to scale. Started getting video testimonials"</div>
+      <div class="source">— commenter on <a href="https://youtube.com/watch?v=EsgQ0bQzvZ0" target="_blank">How To Get 1,000 Paying SaaS Customer FAST From Scratch</a> (Alex Becker Tech)</div>
+    </div>
+    <div class="card tactic-card">
+      <div class="badges">
+        <span class="badge category" style="background:#84cc16">positioning</span>
+        <span class="badge stage">MVP</span>
+        <span class="badge source-commenter">1 commenter(s)</span>
+      </div>
+      <div class="name">Positioning</div>
+      <div class="quote">"SAAGA Solve ranks us for broad terms, but the buyers who pay come from a super narrow use case"</div>
+      <div class="source">— commenter on <a href="https://youtube.com/watch?v=EsgQ0bQzvZ0" target="_blank">How To Get 1,000 Paying SaaS Customer FAST From Scratch</a> (Alex Becker Tech)</div>
+    </div>
+    <div class="card tactic-card">
+      <div class="badges">
+        <span class="badge category" style="background:#14b8a6">build-in-public</span>
+        <span class="badge stage">MVP</span>
+        <span class="badge source-commenter">1 commenter(s)</span>
+      </div>
+      <div class="name">Build In Public</div>
+      <div class="quote">"I have literally been building for 6 months straight 7 days a week — my newest app goes public tomorrow"</div>
+      <div class="source">— commenter on <a href="https://youtube.com/watch?v=9T1yWEq5kP0" target="_blank">SaaS is minting millionaires again (here's how)</a> (Greg Isenberg)</div>
+    </div>
+    <div class="card tactic-card">
+      <div class="badges">
+        <span class="badge category" style="background:#8b5cf6">partnerships</span>
+        <span class="badge stage">Revenue</span>
+        <span class="badge source-commenter">1 commenter(s)</span>
+      </div>
+      <div class="name">Partnerships</div>
+      <div class="quote">"Build AI autonomous workflows in your product (Claude/loop - Dispatch and agentmail). The ROI for the customer is 10x over your integration partner."</div>
+      <div class="source">— commenter on <a href="https://youtube.com/watch?v=Hy4eBvxvVfk" target="_blank">Not Sure How to Market Your SaaS? Start Here</a> (Rob Walling)</div>
+    </div>
+    <div class="card tactic-card">
+      <div class="badges">
+        <span class="badge category" style="background:#ef4444">cold-outbound</span>
+        <span class="badge stage">V1 / Launch</span>
+        <span class="badge source-commenter">1 commenter(s)</span>
+      </div>
+      <div class="name">Trigger Based Outreach</div>
+      <div class="quote">"People now naturally go to different platforms depending on the type of answer they need"</div>
+      <div class="source">— commenter on <a href="https://youtube.com/watch?v=hXPALnu3Y6I" target="_blank">The 8 Trends I'm Betting My Entire Marketing Strategy On in 2026</a> (Neil Patel)</div>
+    </div>
+    <div class="card tactic-card">
+      <div class="badges">
+        <span class="badge category" style="background:#f59e0b">content</span>
+        <span class="badge stage">Cross-stage</span>
+        <span class="badge source-commenter">1 commenter(s)</span>
+      </div>
+      <div class="name">Podcast Marketing</div>
+      <div class="quote">"I did this with my coaching practice...personal training practice...podcasting...and it's definitely 100% true"</div>
+      <div class="source">— commenter on <a href="https://youtube.com/watch?v=w6zEwLMV5Rg" target="_blank">Quick Way To Get Your First 10 Customers</a> (Alex Hormozi)</div>
+    </div>
+    <div class="card tactic-card">
+      <div class="badges">
+        <span class="badge category" style="background:#06b6d4">growth-loops</span>
+        <span class="badge stage">MVP</span>
+        <span class="badge source-commenter">1 commenter(s)</span>
+      </div>
+      <div class="name">Lead Magnet Opt In</div>
+      <div class="quote">"you don't get into how you setup the organic social tests (don't have a social media marketing background)"</div>
+      <div class="source">— commenter on <a href="https://youtube.com/watch?v=AkdiTRGFc18" target="_blank">How To Create a Go To Market Strategy (2026 Playbook)</a> (TK Kader)</div>
+    </div>
+    <div class="card tactic-card">
+      <div class="badges">
+        <span class="badge category" style="background:#ec4899">ads</span>
+        <span class="badge stage">V1 / Launch</span>
+        <span class="badge source-commenter">1 commenter(s)</span>
+      </div>
+      <div class="name">Linkedin Ads</div>
+      <div class="quote">"the gap between knowing what to do and having the team capacity to execute it cleanly is where most B2B growth plans quietly fall apart"</div>
+      <div class="source">— commenter on <a href="https://youtube.com/watch?v=tLggx01ICSA" target="_blank">11 Best B2B Marketing Strategies for 2026</a> (Ben B2B)</div>
+    </div>
+    <div class="card tactic-card">
+      <div class="badges">
+        <span class="badge category" style="background:#f97316">social-proof</span>
+        <span class="badge stage">V1 / Launch</span>
+        <span class="badge source-commenter">1 commenter(s)</span>
+      </div>
+      <div class="name">Review Sites G2</div>
+      <div class="quote">"Love the idea - pick a successful product and solve the problems people are complaining about them and try to grab a small pie of it."</div>
+      <div class="source">— commenter on <a href="https://youtube.com/watch?v=67zh8_yiPh4" target="_blank">I Built 3 SaaS Apps to $200K MRR</a> (Starter Story)</div>
+    </div>
+    <div class="card tactic-card">
+      <div class="badges">
+        <span class="badge category" style="background:#ef4444">cold-outbound</span>
+        <span class="badge stage">Beta</span>
+        <span class="badge source-commenter">1 commenter(s)</span>
+      </div>
+      <div class="name">Loom Video Outreach</div>
+      <div class="quote">"We just launched our first SaaS and started the outreach to our network. We will now for sure look into personalized loom videos"</div>
+      <div class="source">— commenter on <a href="https://youtube.com/watch?v=jsK118WxNaw" target="_blank">Top 7 SaaS Marketing Strategies</a> (Dekker the Marketer)</div>
+    </div>
+    <div class="card tactic-card">
+      <div class="badges">
+        <span class="badge category" style="background:#a855f7">psychology</span>
+        <span class="badge stage">Beta</span>
+        <span class="badge source-commenter">1 commenter(s)</span>
+      </div>
+      <div class="name">Psychology Exclusivity</div>
+      <div class="quote">"the video gave me the inspiration to finally build my micro SaaS idea — I've launched private beta and getting ready for public"</div>
+      <div class="source">— commenter on <a href="https://youtube.com/watch?v=ndqX4vbR7Rc" target="_blank">Making $$$ with MicroSaaS</a> (Greg Isenberg)</div>
+    </div>
+    </div>
+  </section>
+
+  <section id="contradictions">
+    <h2>Where creators disagree</h2>
+    <p style="color:var(--text-muted)">Real disagreements in the corpus. These are where you have to make a judgment call — defaults are unsafe.</p>
+    <div class="contradiction">
+      <div class="contradiction-header">Reddit as a launch channel</div>
+      <div class="contradiction-sides">
+        <div class="side a">
+          <h4>Side A</h4>
+          <p><strong>Reddit drives high-quality leads via genuine engagement</strong></p>
+          <p>Multiple creators report 20%+ of traffic and signups from organic Reddit comments and demos in /r/SaaS, /r/Entrepreneur</p>
+          <div class="creators">— Starter Story, Adam Robinson, Rok Bercic, Bishal Katuwal</div>
+        </div>
+        <div class="side b">
+          <h4>Side B</h4>
+          <p><strong>Reddit will ban you fast if you self-promote — high risk channel</strong></p>
+          <p>Mods are aggressive; even one perceived promotional comment gets you shadowbanned or permabanned across a subreddit</p>
+          <div class="creators">— Commenter (38 likes) on Wildfire Labs</div>
+        </div>
+      </div>
+      <div class="resolution"><strong>Read:</strong> Both right. Reddit works if you spend weeks adding value before mentioning your product, and you accept losing accounts. Treat it as high-leverage but volatile.</div>
+    </div>
+    <div class="contradiction">
+      <div class="contradiction-header">Free first-customers strategy</div>
+      <div class="contradiction-sides">
+        <div class="side a">
+          <h4>Side A</h4>
+          <p><strong>Give the product free to your first 10 customers — speed > revenue</strong></p>
+          <p>Free customers give honest feedback, drive testimonials, and create your case study library faster than paid ones</p>
+          <div class="creators">— Alex Hormozi, Alex Becker</div>
+        </div>
+        <div class="side b">
+          <h4>Side B</h4>
+          <p><strong>Free is harder to give than cheap. Charge something — even $1 — to filter signal</strong></p>
+          <p>Free users churn instantly when convenient. A paying customer at $5 reveals real willingness more than 100 free trials.</p>
+          <div class="creators">— Commenter (Alex Hormozi video), Rob Walling</div>
+        </div>
+      </div>
+      <div class="resolution"><strong>Read:</strong> Free works for the first 5-10 as a deliberate testimonial-collection move. After that, even nominal pricing filters tire-kickers. Don't conflate free-for-feedback with freemium-as-strategy.</div>
+    </div>
+    <div class="contradiction">
+      <div class="contradiction-header">Traditional launches (Product Hunt / big-bang waitlist)</div>
+      <div class="contradiction-sides">
+        <div class="side a">
+          <h4>Side A</h4>
+          <p><strong>Product Hunt + waitlist drip = the standard zero-to-launch playbook</strong></p>
+          <p>Multiple founders cite Product Hunt #1 days driving 1,000+ signups in 24 hours</p>
+          <div class="creators">— Rob Walling, Greg Isenberg, Starter Story</div>
+        </div>
+        <div class="side b">
+          <h4>Side B</h4>
+          <p><strong>Big-bang launches are dead for AI/SaaS in 2026 — slow trickle wins</strong></p>
+          <p>AI products are imperfect at launch. Public big-bang exposes flaws. Cohort drips let you stabilize between waves.</p>
+          <div class="creators">— TK Kader, Tom Ross (cohort model)</div>
+        </div>
+      </div>
+      <div class="resolution"><strong>Read:</strong> Product Hunt still works as one touch — but the real engine is build-in-public + waitlist drip months in advance. Treat PH as one channel of many, not the launch.</div>
+    </div>
+    <div class="contradiction">
+      <div class="contradiction-header">Customer interviews vs pre-sales</div>
+      <div class="contradiction-sides">
+        <div class="side a">
+          <h4>Side A</h4>
+          <p><strong>Talk to customers — Mom Test interviews validate idea cheaply</strong></p>
+          <p>Standard customer-development playbook from The Mom Test, classic startup advice</p>
+          <div class="creators">— Y Combinator-aligned, Rob Walling</div>
+        </div>
+        <div class="side b">
+          <h4>Side B</h4>
+          <p><strong>Verbal validation is worthless. Only money in bank is proof.</strong></p>
+          <p>Founders who relied on interviews built products no one paid for. Fake sales call + asking for credit card filters real demand.</p>
+          <div class="creators">— Commenter (Rob Walling video, 11 likes), Alex Becker</div>
+        </div>
+      </div>
+      <div class="resolution"><strong>Read:</strong> Use interviews to find the pain. Use a pre-sale (or LOI / deposit) to validate willingness to pay. They're sequential, not alternatives.</div>
+    </div>
+    <div class="contradiction">
+      <div class="contradiction-header">Audience-first vs product-first</div>
+      <div class="contradiction-sides">
+        <div class="side a">
+          <h4>Side A</h4>
+          <p><strong>Build an audience BEFORE the product — distribution is the moat</strong></p>
+          <p>RB2B hit $1M ARR in 6 weeks because LinkedIn audience pre-existed. Rand built Moz blog for 5 years before tool launch.</p>
+          <div class="creators">— Greg Isenberg, Adam Robinson, Rand Fishkin, Matt Gray</div>
+        </div>
+        <div class="side b">
+          <h4>Side B</h4>
+          <p><strong>Audience-building takes years. Most founders don't have years. Ship first, market second.</strong></p>
+          <p>ShipFast leaderboard shows products shipped fast can still find customers via SEO and Reddit without prior audience</p>
+          <div class="creators">— Marc Lou (implied), Pieter Levels (implied)</div>
+        </div>
+      </div>
+      <div class="resolution"><strong>Read:</strong> If you already have any reach (even 200 followers in the right niche), use it. If you don't, ship + post-build-in-public — audience grows alongside revenue. Don't sequentialize them.</div>
+    </div>
+  </section>
+
+  <section id="playbook">
+    <h2>Per-stage playbook — Idea → Revenue</h2>
+    <p style="color:var(--text-muted)">Tactics grouped by the stage where they're most relevant. Within each stage: consensus moves first (do these), then emerging, then anomalies (worth trying if you have edges).</p>
+    <details class="stage-section" open>
+      <summary>Idea (7 tactics)</summary>
+      <div class="stage-body">
+<h3>Consensus — do these</h3><ul><li><strong>Anti Persona</strong> <span class="badge category" style="background:#84cc16;font-size:10px">positioning</span> <span style="color:var(--text-muted);font-size:13px">(8c, 1cm)</span> — <em style="color:var(--text-muted)">"brand marketing comes much later... product marketing and demand generation marketing are the two co"</em></li></ul><h3>Emerging — strong but not universal</h3><ul><li><strong>Waitlist</strong> <span class="badge category" style="background:#eab308;font-size:10px">launches</span> <span style="color:var(--text-muted);font-size:13px">(4c, 2cm)</span> — <em style="color:var(--text-muted)">"Ideally, this happens way before you're going to launch. In fact, probably before you even start bui"</em></li><li><strong>Pre Sell Validate</strong> <span class="badge category" style="background:#6366f1;font-size:10px">validation</span> <span style="color:var(--text-muted);font-size:13px">(4c, 2cm)</span> — <em style="color:var(--text-muted)">"would you pay $3,000 up front if we set this all up for you? Everybody was saying yes... I'm not act"</em></li><li><strong>Indie Hackers Community</strong> <span class="badge category" style="background:#10b981;font-size:10px">community</span> <span style="color:var(--text-muted);font-size:13px">(3c, 0cm)</span> — <em style="color:var(--text-muted)">"Indie hackers get their product in people's hands fast, gather real feedback, and iterate on the fly"</em></li></ul><h3>Anomalies — edge plays</h3><ul><li><strong>Interview Customers</strong> <span class="badge category" style="background:#6366f1;font-size:10px">validation</span> <span style="color:var(--text-muted);font-size:13px">(2c, 0cm)</span> — <em style="color:var(--text-muted)">"commit to 50 discovery calls minimum — find people who will pay for something you haven't built yet."</em></li><li><strong>Workflow Mapping</strong> <span class="badge category" style="background:#6366f1;font-size:10px">validation</span> <span style="color:var(--text-muted);font-size:13px">(1c, 0cm)</span> — <em style="color:var(--text-muted)">"you're going to want to map this subniche's workflow end to end... highlighting where money changes "</em></li><li><strong>Quantify Pain In Dollars</strong> <span class="badge category" style="background:#84cc16;font-size:10px">positioning</span> <span style="color:var(--text-muted);font-size:13px">(1c, 0cm)</span> — <em style="color:var(--text-muted)">"if that person is making $250,000 a year, you can literally quantify that and it becomes thousands o"</em></li></ul>      </div>
+    </details>
+    <details class="stage-section" open>
+      <summary>MVP (15 tactics)</summary>
+      <div class="stage-body">
+<h3>Consensus — do these</h3><ul><li><strong>Positioning</strong> <span class="badge category" style="background:#84cc16;font-size:10px">positioning</span> <span style="color:var(--text-muted);font-size:13px">(8c, 1cm)</span> — <em style="color:var(--text-muted)">"what does that person say about your product when they describe it to somebody else? That's your pos"</em></li><li><strong>Build In Public</strong> <span class="badge category" style="background:#14b8a6;font-size:10px">build-in-public</span> <span style="color:var(--text-muted);font-size:13px">(7c, 1cm)</span> — <em style="color:var(--text-muted)">"create some YouTube videos because this way I could still create technical side projects without hav"</em></li><li><strong>Shorts Tiktok</strong> <span class="badge category" style="background:#f59e0b;font-size:10px">content</span> <span style="color:var(--text-muted);font-size:13px">(6c, 1cm)</span> — <em style="color:var(--text-muted)">"you're going to not just want to create a product — you're going to want to create media"</em></li><li><strong>Newsletter</strong> <span class="badge category" style="background:#f59e0b;font-size:10px">content</span> <span style="color:var(--text-muted);font-size:13px">(6c, 0cm)</span> — <em style="color:var(--text-muted)">"email is an owned channel. Your email list is yours. No algorithm can take that away. No platform ch"</em></li><li><strong>Outcome Selling</strong> <span class="badge category" style="background:#84cc16;font-size:10px">positioning</span> <span style="color:var(--text-muted);font-size:13px">(6c, 0cm)</span> — <em style="color:var(--text-muted)">"the per-seat model is losing its allure and people just want per-task — complete this workflow for $"</em></li><li><strong>Reddit Marketing</strong> <span class="badge category" style="background:#f59e0b;font-size:10px">content</span> <span style="color:var(--text-muted);font-size:13px">(6c, 0cm)</span> — <em style="color:var(--text-muted)">"I started posting it in programming subreddits, command line tool subreddits... I just got downvoted"</em></li></ul><h3>Emerging — strong but not universal</h3><ul><li><strong>Appsumo Ltd</strong> <span class="badge category" style="background:#eab308;font-size:10px">launches</span> <span style="color:var(--text-muted);font-size:13px">(3c, 0cm)</span> — <em style="color:var(--text-muted)">"Send them payment links and say 'I will give you a lifetime deal to this.' That way they're more inc"</em></li><li><strong>Founder Led Sales</strong> <span class="badge category" style="background:#dc2626;font-size:10px">sales</span> <span style="color:var(--text-muted);font-size:13px">(3c, 0cm)</span> — <em style="color:var(--text-muted)">"Stripe first launched, they were doing it all for their customers. You have to do things that don't "</em></li></ul><h3>Anomalies — edge plays</h3><ul><li><strong>Lead Magnet Opt In</strong> <span class="badge category" style="background:#06b6d4;font-size:10px">growth-loops</span> <span style="color:var(--text-muted);font-size:13px">(2c, 1cm)</span> — <em style="color:var(--text-muted)">"you don't get into how you setup the organic social tests (don't have a social media marketing backg"</em></li><li><strong>Open Source Release</strong> <span class="badge category" style="background:#06b6d4;font-size:10px">growth-loops</span> <span style="color:var(--text-muted);font-size:13px">(2c, 0cm)</span> — <em style="color:var(--text-muted)">"I decided to take my GitHub seriously, create a nice profile and release the open source part... I g"</em></li><li><strong>User Generated Content</strong> <span class="badge category" style="background:#ec4899;font-size:10px">ads</span> <span style="color:var(--text-muted);font-size:13px">(2c, 0cm)</span> — <em style="color:var(--text-muted)">"Spent around $1,500 generating 4,000 downloads — that's 37 cents per download using the deals featur"</em></li><li><strong>Delayed Billing Roi</strong> <span class="badge category" style="background:#dc2626;font-size:10px">sales</span> <span style="color:var(--text-muted);font-size:13px">(1c, 0cm)</span> — <em style="color:var(--text-muted)">"if someone's spending $100,000 a month on ads and losing $10,000... I say will you pay $500 a month "</em></li><li><strong>Do Things That Dont Scale</strong> <span class="badge category" style="background:#dc2626;font-size:10px">sales</span> <span style="color:var(--text-muted);font-size:13px">(1c, 0cm)</span> — <em style="color:var(--text-muted)">"a lot of these future SaaS businesses are actually going to start off as service businesses with hum"</em></li><li><strong>Free Tools</strong> <span class="badge category" style="background:#06b6d4;font-size:10px">growth-loops</span> <span style="color:var(--text-muted);font-size:13px">(1c, 0cm)</span> — <em style="color:var(--text-muted)">"free tools bring in roughly 20% of all of our traffic and converts like 15 to 20% of all visitors in"</em></li></ul><h3>From commenters only</h3><ul><li><strong>Stop Doing Framing</strong> <span class="badge category" style="background:#84cc16;font-size:10px">positioning</span> <span style="color:var(--text-muted);font-size:13px">(0c, 1cm)</span> — <em style="color:var(--text-muted)">"the biggest lesson: tradespeople don't want 'AI software' — they want to stop writing quotes at 9pm"</em></li></ul>      </div>
+    </details>
+    <details class="stage-section" open>
+      <summary>Beta (7 tactics)</summary>
+      <div class="stage-body">
+<h3>Anomalies — edge plays</h3><ul><li><strong>Loom Video Outreach</strong> <span class="badge category" style="background:#ef4444;font-size:10px">cold-outbound</span> <span style="color:var(--text-muted);font-size:13px">(2c, 1cm)</span> — <em style="color:var(--text-muted)">"We just launched our first SaaS and started the outreach to our network. We will now for sure look i"</em></li><li><strong>Events Conferences</strong> <span class="badge category" style="background:#10b981;font-size:10px">community</span> <span style="color:var(--text-muted);font-size:13px">(2c, 0cm)</span> — <em style="color:var(--text-muted)">"That event and community went from zero to 13,000 in the first 90 days because there were so many pe"</em></li><li><strong>Product Hunt Launch</strong> <span class="badge category" style="background:#eab308;font-size:10px">launches</span> <span style="color:var(--text-muted);font-size:13px">(2c, 0cm)</span> — <em style="color:var(--text-muted)">"There are dozens of other websites. Those websites are going to mention my website and improve the r"</em></li><li><strong>Welcome Email Sequence</strong> <span class="badge category" style="background:#06b6d4;font-size:10px">growth-loops</span> <span style="color:var(--text-muted);font-size:13px">(2c, 0cm)</span> — <em style="color:var(--text-muted)">"a well-written five email welcome sequence can dramatically improve your conversion rate"</em></li><li><strong>Psychology Exclusivity</strong> <span class="badge category" style="background:#a855f7;font-size:10px">psychology</span> <span style="color:var(--text-muted);font-size:13px">(1c, 1cm)</span> — <em style="color:var(--text-muted)">"the video gave me the inspiration to finally build my micro SaaS idea — I've launched private beta a"</em></li><li><strong>Channel Focus</strong> <span class="badge category" style="background:#84cc16;font-size:10px">positioning</span> <span style="color:var(--text-muted);font-size:13px">(1c, 0cm)</span> — <em style="color:var(--text-muted)">"go deep on one to two channels. Don't scatter across 10. Pick the channels where your ideal users al"</em></li><li><strong>High Touch Onboarding</strong> <span class="badge category" style="background:#dc2626;font-size:10px">sales</span> <span style="color:var(--text-muted);font-size:13px">(1c, 0cm)</span> — <em style="color:var(--text-muted)">"launch narrow with high-touch onboarding — really get to know the customers, get as much data as pos"</em></li></ul>      </div>
+    </details>
+    <details class="stage-section" >
+      <summary>V1 / Launch (25 tactics)</summary>
+      <div class="stage-body">
+<h3>Consensus — do these</h3><ul><li><strong>Seo Content</strong> <span class="badge category" style="background:#3b82f6;font-size:10px">seo</span> <span style="color:var(--text-muted);font-size:13px">(18c, 2cm)</span> — <em style="color:var(--text-muted)">"organic, social fuels a paid social, the paid social works, then you can do outbound... then you can"</em></li><li><strong>Cold Email</strong> <span class="badge category" style="background:#ef4444;font-size:10px">cold-outbound</span> <span style="color:var(--text-muted);font-size:13px">(10c, 0cm)</span> — <em style="color:var(--text-muted)">"before you send a cold email, before you run a campaign, before we launch a lead magnet — you have t"</em></li><li><strong>Case Studies Testimonials</strong> <span class="badge category" style="background:#f97316;font-size:10px">social-proof</span> <span style="color:var(--text-muted);font-size:13px">(8c, 1cm)</span> — <em style="color:var(--text-muted)">"give us a testimonial about what this did for your business, and then we'll let you stay on. We want"</em></li><li><strong>Psychology Storytelling</strong> <span class="badge category" style="background:#a855f7;font-size:10px">psychology</span> <span style="color:var(--text-muted);font-size:13px">(8c, 0cm)</span> — <em style="color:var(--text-muted)">"70% of who they're going to buy from, all that information is marketed to them before the actual poi"</em></li><li><strong>Linkedin Organic</strong> <span class="badge category" style="background:#f59e0b;font-size:10px">content</span> <span style="color:var(--text-muted);font-size:13px">(6c, 0cm)</span> — <em style="color:var(--text-muted)">"we start with organic social. And our core metric for this is pipeline and then revenue... if it wor"</em></li><li><strong>Youtube Content</strong> <span class="badge category" style="background:#f59e0b;font-size:10px">content</span> <span style="color:var(--text-muted);font-size:13px">(5c, 0cm)</span> — <em style="color:var(--text-muted)">"take YouTube content and republish up to 15 minutes of it on LinkedIn or Meta and target your audien"</em></li></ul><h3>Emerging — strong but not universal</h3><ul><li><strong>Trigger Based Outreach</strong> <span class="badge category" style="background:#ef4444;font-size:10px">cold-outbound</span> <span style="color:var(--text-muted);font-size:13px">(4c, 1cm)</span> — <em style="color:var(--text-muted)">"the person has been working at a new job for 3 to 6 months before they get in contact. They want to "</em></li><li><strong>Psychology Scarcity</strong> <span class="badge category" style="background:#a855f7;font-size:10px">psychology</span> <span style="color:var(--text-muted);font-size:13px">(3c, 0cm)</span> — <em style="color:var(--text-muted)">"the only advantage you have over an incumbent is urgency and speed... Earlier you can launch, the fa"</em></li><li><strong>Linkedin Dms</strong> <span class="badge category" style="background:#ef4444;font-size:10px">cold-outbound</span> <span style="color:var(--text-muted);font-size:13px">(3c, 0cm)</span> — <em style="color:var(--text-muted)">"once they like or comment on something you posted — send DM. Response rate is usually north of 60% b"</em></li></ul><h3>Anomalies — edge plays</h3><ul><li><strong>Linkedin Ads</strong> <span class="badge category" style="background:#ec4899;font-size:10px">ads</span> <span style="color:var(--text-muted);font-size:13px">(2c, 1cm)</span> — <em style="color:var(--text-muted)">"the gap between knowing what to do and having the team capacity to execute it cleanly is where most "</em></li><li><strong>Review Sites G2</strong> <span class="badge category" style="background:#f97316;font-size:10px">social-proof</span> <span style="color:var(--text-muted);font-size:13px">(2c, 1cm)</span> — <em style="color:var(--text-muted)">"Love the idea - pick a successful product and solve the problems people are complaining about them a"</em></li><li><strong>Visitor Identification</strong> <span class="badge category" style="background:#ef4444;font-size:10px">cold-outbound</span> <span style="color:var(--text-muted);font-size:13px">(2c, 0cm)</span> — <em style="color:var(--text-muted)">"we manually sent spreadsheets over email for five full months before we even put up a website — stay"</em></li><li><strong>Freemium</strong> <span class="badge category" style="background:#06b6d4;font-size:10px">growth-loops</span> <span style="color:var(--text-muted);font-size:13px">(2c, 0cm)</span> — <em style="color:var(--text-muted)">"freemium in itself doesn't inherently include distribution — don't confuse freemium with virality"</em></li><li><strong>Direct Mail</strong> <span class="badge category" style="background:#ef4444;font-size:10px">cold-outbound</span> <span style="color:var(--text-muted);font-size:13px">(2c, 0cm)</span> — <em style="color:var(--text-muted)">"direct mail is a super touch point... 90% of direct mail campaigns drive a sale within 6 months"</em></li><li><strong>Bing Microsoft Ads</strong> <span class="badge category" style="background:#ec4899;font-size:10px">ads</span> <span style="color:var(--text-muted);font-size:13px">(2c, 0cm)</span> — <em style="color:var(--text-muted)">"Bing Ads have a much higher conversion rate. It's cheaper traffic. The demographic of people that se"</em></li><li><strong>In Person Events Meetups</strong> <span class="badge category" style="background:#10b981;font-size:10px">community</span> <span style="color:var(--text-muted);font-size:13px">(2c, 0cm)</span> — <em style="color:var(--text-muted)">"clear data proving that communities with an in-person element have lower churn, higher retention, an"</em></li><li><strong>Psychology Curiosity</strong> <span class="badge category" style="background:#a855f7;font-size:10px">psychology</span> <span style="color:var(--text-muted);font-size:13px">(2c, 0cm)</span> — <em style="color:var(--text-muted)">"Start posting about it the week before, gaining momentum. Post on socials. Try to get friends and ot"</em></li><li><strong>Abm Account Based</strong> <span class="badge category" style="background:#dc2626;font-size:10px">sales</span> <span style="color:var(--text-muted);font-size:13px">(1c, 1cm)</span> — <em style="color:var(--text-muted)">"Can you make one for SaaS company that has 0 revenue, just starting?"</em></li><li><strong>Iteration Sprints</strong> <span class="badge category" style="background:#06b6d4;font-size:10px">growth-loops</span> <span style="color:var(--text-muted);font-size:13px">(1c, 0cm)</span> — <em style="color:var(--text-muted)">"you run it for a three week period, and if it works well, then you scale it. If it doesn't work, the"</em></li></ul>      </div>
+    </details>
+    <details class="stage-section" >
+      <summary>Revenue (3 tactics)</summary>
+      <div class="stage-body">
+<h3>Consensus — do these</h3><ul><li><strong>Partnerships</strong> <span class="badge category" style="background:#8b5cf6;font-size:10px">partnerships</span> <span style="color:var(--text-muted);font-size:13px">(5c, 1cm)</span> — <em style="color:var(--text-muted)">"I have a client — they've scaled to 120 million turnover just through leveraging affiliate networks"</em></li></ul><h3>Anomalies — edge plays</h3><ul><li><strong>Data Moat</strong> <span class="badge category" style="background:#84cc16;font-size:10px">positioning</span> <span style="color:var(--text-muted);font-size:13px">(2c, 0cm)</span> — <em style="color:var(--text-muted)">"you can resell the anonymized aggregate stats via an API — unique data that someone would buy. Peopl"</em></li><li><strong>Video Case Studies</strong> <span class="badge category" style="background:#f97316;font-size:10px">social-proof</span> <span style="color:var(--text-muted);font-size:13px">(1c, 0cm)</span> — <em style="color:var(--text-muted)">"send a camera crew or go yourself and film these people — full-on case studies, then put paid spend "</em></li></ul>      </div>
+    </details>
+    <details class="stage-section" >
+      <summary>Cross-stage (12 tactics)</summary>
+      <div class="stage-body">
+<h3>Consensus — do these</h3><ul><li><strong>Community Led Growth</strong> <span class="badge category" style="background:#10b981;font-size:10px">community</span> <span style="color:var(--text-muted);font-size:13px">(13c, 3cm)</span> — <em style="color:var(--text-muted)">"community members often help each other with questions, speeding up onboarding and making new featur"</em></li><li><strong>Twitter X Organic</strong> <span class="badge category" style="background:#f59e0b;font-size:10px">content</span> <span style="color:var(--text-muted);font-size:13px">(12c, 1cm)</span> — <em style="color:var(--text-muted)">"you simply can't replicate what they are doing. They have extreme distribution potential because eve"</em></li><li><strong>Distribution First</strong> <span class="badge category" style="background:#84cc16;font-size:10px">positioning</span> <span style="color:var(--text-muted);font-size:13px">(8c, 5cm)</span> — <em style="color:var(--text-muted)">"at Go HighLevel, they allowed agencies to white label the software and then sell it as their own. Yo"</em></li><li><strong>Referral Loop</strong> <span class="badge category" style="background:#06b6d4;font-size:10px">growth-loops</span> <span style="color:var(--text-muted);font-size:13px">(9c, 0cm)</span> — <em style="color:var(--text-muted)">"building a community also turns users into advocates. They recommend the product to others, helping "</em></li><li><strong>Pain Point Messaging</strong> <span class="badge category" style="background:#84cc16;font-size:10px">positioning</span> <span style="color:var(--text-muted);font-size:13px">(8c, 0cm)</span> — <em style="color:var(--text-muted)">"most founders try to appeal to everyone and they end up resonating with no one. The fix is to narrow"</em></li><li><strong>Facebook Google Ads</strong> <span class="badge category" style="background:#ec4899;font-size:10px">ads</span> <span style="color:var(--text-muted);font-size:13px">(7c, 0cm)</span> — <em style="color:var(--text-muted)">"double down on organic angles that convert, but also run paid ads on the proven organic winners"</em></li><li><strong>Founder Personal Brand</strong> <span class="badge category" style="background:#14b8a6;font-size:10px">build-in-public</span> <span style="color:var(--text-muted);font-size:13px">(5c, 3cm)</span> — <em style="color:var(--text-muted)">"founder-led content still drives conversion better than almost anything else. When you show up on ca"</em></li><li><strong>Geo Llm Search</strong> <span class="badge category" style="background:#3b82f6;font-size:10px">seo</span> <span style="color:var(--text-muted);font-size:13px">(5c, 0cm)</span> — <em style="color:var(--text-muted)">"LLMs like ChatGPT and Perplexity are pulling content to answer queries directly. The same principles"</em></li></ul><h3>Emerging — strong but not universal</h3><ul><li><strong>Podcast Marketing</strong> <span class="badge category" style="background:#f59e0b;font-size:10px">content</span> <span style="color:var(--text-muted);font-size:13px">(4c, 1cm)</span> — <em style="color:var(--text-muted)">"Building a media brand alongside your SaaS product is only for very well-funded companies or folks w"</em></li><li><strong>Retargeting Ads</strong> <span class="badge category" style="background:#ec4899;font-size:10px">ads</span> <span style="color:var(--text-muted);font-size:13px">(4c, 0cm)</span> — <em style="color:var(--text-muted)">"we don't fire a conversion pixel unless it's an ICP lead. So trains the ad algorithms to send you mo"</em></li><li><strong>Competitor Alternative Pages</strong> <span class="badge category" style="background:#3b82f6;font-size:10px">seo</span> <span style="color:var(--text-muted);font-size:13px">(3c, 0cm)</span> — <em style="color:var(--text-muted)">"If your cost is a few hundred a month, there's nothing stopping you from being around forever. The b"</em></li></ul><h3>Anomalies — edge plays</h3><ul><li><strong>Narrow Niche Subniche</strong> <span class="badge category" style="background:#84cc16;font-size:10px">positioning</span> <span style="color:var(--text-muted);font-size:13px">(1c, 0cm)</span> — <em style="color:var(--text-muted)">"Niche down, brother. If somebody else gets funded, they now need to serve a huge market — which mean"</em></li></ul>      </div>
+    </details>
+  </section>
+
+  <section id="diversity">
+    <h2>Source diversity — are we in an echo chamber?</h2>
+    <p style="color:var(--text-muted)">Top 15 channels by # videos contributed. If 1-2 channels dominate, anomalies skew toward their world. This corpus pulled from 49 channels across indie/bootstrapped, VC-track, sales operators, and marketing operators.</p>
+    <div class="chart-container" style="height:500px">
+      <canvas id="diversityChart"></canvas>
+    </div>
+  </section>
+
+  <section id="methodology">
+    <h2>Methodology + Sources</h2>
+    <details>
+      <summary>How this was built</summary>
+      <div style="padding:8px 0; font-size:14px; color:var(--text-muted)">
+        <p>Phase 1: 1 Haiku 4.5 agent ran 15 YouTube searches across the topic, deduplicated, ranked by views × recency, and produced the 65-video master list.</p>
+        <p>Phase 2: 10 Sonnet 4.6 agents ran in parallel. Each pulled transcript + top 50 comments per video, extracted tactics tagged with source (creator vs commenter), stage, category, and confidence.</p>
+        <p>Phase 3: Opus 4.7 normalized 620 raw tactics into 69 canonical clusters via keyword matching with word-boundary safety, built creator/commenter frequency maps, computed co-occurrence edges, and classified into consensus/emerging/anomaly/commenter-only buckets.</p>
+        <p>Phase 4: This HTML. Phase 5: paired markdown notes in <code>examples/saas-marketing/</code>.</p>
+        <p>Skipped videos: 2 (transcripts too thin to extract from). Unclassified tactics: 204 (creator-specific advice that didn't match any canonical cluster — preserved in dataset.json for future review).</p>
+      </div>
+    </details>
+    <details>
+      <summary>All 63 videos analyzed (click to expand)</summary>
+      <div class="method-list">
+<div style="margin:4px 0">• <strong>Greg Isenberg</strong> — <a href="https://youtube.com/watch?v=9T1yWEq5kP0" target="_blank">SaaS is minting millionaires again (here's how)</a> <span style="opacity:0.6">(13 tactics)</span></div><div style="margin:4px 0">• <strong>Ben B2B</strong> — <a href="https://youtube.com/watch?v=tLggx01ICSA" target="_blank">11 Best B2B Marketing Strategies for 2026</a> <span style="opacity:0.6">(11 tactics)</span></div><div style="margin:4px 0">• <strong>Sam Dunning - Breaking B2B</strong> — <a href="https://youtube.com/watch?v=LTdWTf1OGKg" target="_blank">Best SaaS Marketing Strategies for 2026</a> <span style="opacity:0.6">(9 tactics)</span></div><div style="margin:4px 0">• <strong>Dekker the Marketer</strong> — <a href="https://youtube.com/watch?v=jsK118WxNaw" target="_blank">Top 7 SaaS Marketing Strategies</a> <span style="opacity:0.6">(9 tactics)</span></div><div style="margin:4px 0">• <strong>Adam Robinson</strong> — <a href="https://youtube.com/watch?v=r47Q4Cfit5s" target="_blank">If I Started a SaaS in 2026, I'd Do This (0 to 1,000+ Users)</a> <span style="opacity:0.6">(8 tactics)</span></div><div style="margin:4px 0">• <strong>Oren Greenberg</strong> — <a href="https://youtube.com/watch?v=vlv15nEH-zk" target="_blank">The Best SaaS Marketing Strategy in 2025</a> <span style="opacity:0.6">(8 tactics)</span></div><div style="margin:4px 0">• <strong>Rob Walling</strong> — <a href="https://youtube.com/watch?v=Hy4eBvxvVfk" target="_blank">Not Sure How to Market Your SaaS? Start Here</a> <span style="opacity:0.6">(8 tactics)</span></div><div style="margin:4px 0">• <strong>Starter Story</strong> — <a href="https://youtube.com/watch?v=l4WEqPX52Cg" target="_blank">How This $250K/Month SaaS Got First 100 Users</a> <span style="opacity:0.6">(8 tactics)</span></div><div style="margin:4px 0">• <strong>SaaS Mastery</strong> — <a href="https://youtube.com/watch?v=67MX3_N4Lfo" target="_blank">Best SaaS Marketing Strategy to get your first 100 Customers Without Ads</a> <span style="opacity:0.6">(8 tactics)</span></div><div style="margin:4px 0">• <strong>TK Kader</strong> — <a href="https://youtube.com/watch?v=RO2ifYXL5d0" target="_blank">Best SaaS Marketing Strategies For 2026</a> <span style="opacity:0.6">(7 tactics)</span></div><div style="margin:4px 0">• <strong>Brandon Burr</strong> — <a href="https://youtube.com/watch?v=4z3E0VojrGA" target="_blank">Best SaaS Marketing Strategies for 2026</a> <span style="opacity:0.6">(7 tactics)</span></div><div style="margin:4px 0">• <strong>Alex Becker Tech</strong> — <a href="https://youtube.com/watch?v=EsgQ0bQzvZ0" target="_blank">How To Get 1,000 Paying SaaS Customer FAST From Scratch</a> <span style="opacity:0.6">(7 tactics)</span></div><div style="margin:4px 0">• <strong>Rok Bercic</strong> — <a href="https://youtube.com/watch?v=1uH05FHHo0A" target="_blank">Best SaaS Marketing Strategies For 2026</a> <span style="opacity:0.6">(7 tactics)</span></div><div style="margin:4px 0">• <strong>Ryan Wardell</strong> — <a href="https://youtube.com/watch?v=Eaen0RZlz8w" target="_blank">How to Grow a SaaS Business in 2025</a> <span style="opacity:0.6">(7 tactics)</span></div><div style="margin:4px 0">• <strong>Adam Robinson</strong> — <a href="https://youtube.com/watch?v=sr9fzxRW0bA" target="_blank">Best SaaS Marketing Strategies For 2026</a> <span style="opacity:0.6">(7 tactics)</span></div><div style="margin:4px 0">• <strong>pookie</strong> — <a href="https://youtube.com/watch?v=6tKxMJ10IuI" target="_blank">Why (almost) All of Indie Hacking is a Scam</a> <span style="opacity:0.6">(6 tactics)</span></div><div style="margin:4px 0">• <strong>Greg Isenberg</strong> — <a href="https://youtube.com/watch?v=ndqX4vbR7Rc" target="_blank">Making $$$ with MicroSaaS</a> <span style="opacity:0.6">(6 tactics)</span></div><div style="margin:4px 0">• <strong>SaasRise</strong> — <a href="https://youtube.com/watch?v=iAI-htMWvBw" target="_blank">The Best SaaS Marketing Strategy for 2026</a> <span style="opacity:0.6">(6 tactics)</span></div><div style="margin:4px 0">• <strong>Ben B2B</strong> — <a href="https://youtube.com/watch?v=jv_jzJIu6o0" target="_blank">5 Smartest SaaS Marketing Strategies in 2026</a> <span style="opacity:0.6">(6 tactics)</span></div><div style="margin:4px 0">• <strong>Wildfire Labs</strong> — <a href="https://youtube.com/watch?v=FRo5A88j_B8" target="_blank">The Marketing Playbook Every Early-Stage SaaS Founder</a> <span style="opacity:0.6">(6 tactics)</span></div><div style="margin:4px 0">• <strong>TK Kader</strong> — <a href="https://youtube.com/watch?v=mCGQWsPUilw" target="_blank">How to Build a Go-To-Market Launch Plan for an AI SaaS Product</a> <span style="opacity:0.6">(6 tactics)</span></div><div style="margin:4px 0">• <strong>SaaSina</strong> — <a href="https://youtube.com/watch?v=c0iHvsHpLpg" target="_blank">Startup Showdown: SaaS Founders vs. Indie Hackers</a> <span style="opacity:0.6">(6 tactics)</span></div><div style="margin:4px 0">• <strong>Starter Story</strong> — <a href="https://youtube.com/watch?v=67zh8_yiPh4" target="_blank">I Built 3 SaaS Apps to $200K MRR</a> <span style="opacity:0.6">(6 tactics)</span></div><div style="margin:4px 0">• <strong>Rob Walling</strong> — <a href="https://youtube.com/watch?v=Nuf1ThmVRcY" target="_blank">6 Signs Your SaaS MVP Is Not Good Enough</a> <span style="opacity:0.6">(6 tactics)</span></div><div style="margin:4px 0">• <strong>Steven Irby</strong> — <a href="https://youtube.com/watch?v=ZJOzisvglFc" target="_blank">Here is how I doing marketing</a> <span style="opacity:0.6">(5 tactics)</span></div><div style="margin:4px 0">• <strong>Tom Ross</strong> — <a href="https://youtube.com/watch?v=nEdGaVY7IK4" target="_blank">How to Build a Thriving Membership Community</a> <span style="opacity:0.6">(5 tactics)</span></div><div style="margin:4px 0">• <strong>Steven Irby</strong> — <a href="https://youtube.com/watch?v=lKuCjmF1BxA" target="_blank">Marketing is Hard</a> <span style="opacity:0.6">(5 tactics)</span></div><div style="margin:4px 0">• <strong>Andrew Zacker</strong> — <a href="https://youtube.com/watch?v=zwUu8SV40hE" target="_blank">I launched a SaaS in 7 days while working full-time</a> <span style="opacity:0.6">(5 tactics)</span></div><div style="margin:4px 0">• <strong>TK Kader</strong> — <a href="https://youtube.com/watch?v=AkdiTRGFc18" target="_blank">How To Create a Go To Market Strategy (2026 Playbook)</a> <span style="opacity:0.6">(5 tactics)</span></div><div style="margin:4px 0">• <strong>Chaminda Tennakoon</strong> — <a href="https://youtube.com/watch?v=Z0XeouJihNg" target="_blank">Product Launch Formula Part 5, The Psychology</a> <span style="opacity:0.6">(5 tactics)</span></div><div style="margin:4px 0">• <strong>John Stewart Marketing</strong> — <a href="https://youtube.com/watch?v=d4TF_WvMN_c" target="_blank">How To Create The Perfect B2B Marketing Strategy For 2026</a> <span style="opacity:0.6">(5 tactics)</span></div><div style="margin:4px 0">• <strong>Matt Sokola</strong> — <a href="https://youtube.com/watch?v=aLFR2IrtxEQ" target="_blank">Why Indie Hacking Keeps Software Engineers POOR</a> <span style="opacity:0.6">(5 tactics)</span></div><div style="margin:4px 0">• <strong>The SaaS Pros Breakdown</strong> — <a href="https://youtube.com/watch?v=9IHfXi5AGgs" target="_blank">How Does Community Impact SaaS Strategy</a> <span style="opacity:0.6">(4 tactics)</span></div><div style="margin:4px 0">• <strong>Chris Raroque</strong> — <a href="https://youtube.com/watch?v=MnF-zJhyUtE" target="_blank">Things I ALWAYS Do Before Launching New Apps</a> <span style="opacity:0.6">(4 tactics)</span></div><div style="margin:4px 0">• <strong>Indie Bites</strong> — <a href="https://youtube.com/watch?v=4xF6oLCs5hs" target="_blank">Andrew Gazdecki on selling indie SaaS businesses</a> <span style="opacity:0.6">(4 tactics)</span></div><div style="margin:4px 0">• <strong>Steven Cravotta</strong> — <a href="https://youtube.com/watch?v=e_t1gYkvZkI" target="_blank">How To Reach 10,000 App Users (Beginner Marketing)</a> <span style="opacity:0.6">(4 tactics)</span></div><div style="margin:4px 0">• <strong>Hattie the PMM</strong> — <a href="https://youtube.com/watch?v=hPp5sj37mOA" target="_blank">What is a Go-To-Market strategy?</a> <span style="opacity:0.6">(4 tactics)</span></div><div style="margin:4px 0">• <strong>Leveling Up with Eric Siu</strong> — <a href="https://youtube.com/watch?v=bGjZzSY_-HQ" target="_blank">The New Rules of B2B Marketing 2026</a> <span style="opacity:0.6">(4 tactics)</span></div><div style="margin:4px 0">• <strong>TK Kader</strong> — <a href="https://youtube.com/watch?v=XMem2vKeXbk" target="_blank">Go-To-Market Strategy Framework That Works in 2026</a> <span style="opacity:0.6">(4 tactics)</span></div><div style="margin:4px 0">• <strong>Johann Sathianathen</strong> — <a href="https://youtube.com/watch?v=aEOs482mCBs" target="_blank">Why Indie Hackers Stay Broke</a> <span style="opacity:0.6">(4 tactics)</span></div><div style="margin:4px 0">• <strong>ProductLed</strong> — <a href="https://youtube.com/watch?v=2i0mZevfErY" target="_blank">The Solo-Founder Playbook: $1M ARR SaaS</a> <span style="opacity:0.6">(4 tactics)</span></div><div style="margin:4px 0">• <strong>Pathmonk</strong> — <a href="https://youtube.com/watch?v=IrMPKIUcA38" target="_blank">Building Legal SaaS Growth Through Community Led Marketing</a> <span style="opacity:0.6">(4 tactics)</span></div><div style="margin:4px 0">• <strong>Neil Patel</strong> — <a href="https://youtube.com/watch?v=hXPALnu3Y6I" target="_blank">The 8 Trends I'm Betting My Entire Marketing Strategy On in 2026</a> <span style="opacity:0.6">(4 tactics)</span></div><div style="margin:4px 0">• <strong>Favikon</strong> — <a href="https://youtube.com/watch?v=G54iqoOd8cc" target="_blank">The Most Underrated SaaS Marketing Strategy?</a> <span style="opacity:0.6">(3 tactics)</span></div><div style="margin:4px 0">• <strong>Mostly Growth</strong> — <a href="https://youtube.com/watch?v=i5ZZiZEu8M4" target="_blank">Why Your Free Users Don't Convert</a> <span style="opacity:0.6">(3 tactics)</span></div><div style="margin:4px 0">• <strong>Sam Dunning - Breaking B2B</strong> — <a href="https://youtube.com/watch?v=MBULPYGCRtg" target="_blank">The Best SaaS Marketing Strategy for 2026</a> <span style="opacity:0.6">(3 tactics)</span></div><div style="margin:4px 0">• <strong>Bishal Katuwal</strong> — <a href="https://youtube.com/watch?v=ZQ-U8U1EX_A" target="_blank">B2B SaaS Marketing in 2025: 6 Strategies That Actually Work</a> <span style="opacity:0.6">(3 tactics)</span></div><div style="margin:4px 0">• <strong>Starter Story</strong> — <a href="https://youtube.com/watch?v=LRX8TWC2hTM" target="_blank">I Make $60K/Month From the Most Boring SaaS</a> <span style="opacity:0.6">(3 tactics)</span></div><div style="margin:4px 0">• <strong>Cool Clips - BAIS INC</strong> — <a href="https://youtube.com/watch?v=QpujWiXvbT8" target="_blank">Slop SaaS in 2026 Explained: Indie Hacker Survival Guide</a> <span style="opacity:0.6">(3 tactics)</span></div><div style="margin:4px 0">• <strong>Adam Erhart</strong> — <a href="https://youtube.com/watch?v=DEiK8uPrQNc" target="_blank">10 DARK PSYCHOLOGY Sales Techniques</a> <span style="opacity:0.6">(3 tactics)</span></div><div style="margin:4px 0">• <strong>Ryan Wardell</strong> — <a href="https://youtube.com/watch?v=ql1QzeHVwtU" target="_blank">Is Product-Led Growth or Sales-Led Growth Better For SaaS?</a> <span style="opacity:0.6">(3 tactics)</span></div><div style="margin:4px 0">• <strong>The Secret Sauce</strong> — <a href="https://youtube.com/watch?v=e40SlNv3PMU" target="_blank">B2B SaaS Marketing Playbook</a> <span style="opacity:0.6">(2 tactics)</span></div><div style="margin:4px 0">• <strong>TA Monroe Digital</strong> — <a href="https://youtube.com/watch?v=_7y5l2D9zRc" target="_blank">How Community-Led Marketing Drives B2B SaaS Growth</a> <span style="opacity:0.6">(2 tactics)</span></div><div style="margin:4px 0">• <strong>Kseniia SaintP</strong> — <a href="https://youtube.com/watch?v=NcRQqemEvY4" target="_blank">You Won't Believe Who My Competitor Is!</a> <span style="opacity:0.6">(2 tactics)</span></div><div style="margin:4px 0">• <strong>Breakthrough SaaS Growth</strong> — <a href="https://youtube.com/watch?v=rWB_RKPcrRg" target="_blank">Customer Communities Are a Massive Untapped Advantage</a> <span style="opacity:0.6">(2 tactics)</span></div><div style="margin:4px 0">• <strong>Exposure Ninja</strong> — <a href="https://youtube.com/watch?v=RdM0URjitSs" target="_blank">The Best B2B Marketing Strategies for 2026 (That ACTUALLY WORK)</a> <span style="opacity:0.6">(2 tactics)</span></div><div style="margin:4px 0">• <strong>Bridget Willard</strong> — <a href="https://youtube.com/watch?v=2OBb_OLTl5c" target="_blank">SaaS Marketing: Build in Public & Win</a> <span style="opacity:0.6">(2 tactics)</span></div><div style="margin:4px 0">• <strong>Matt Gray</strong> — <a href="https://youtube.com/watch?v=6V4y0AX69h4" target="_blank">the psychology of building a brand everyone loves</a> <span style="opacity:0.6">(2 tactics)</span></div><div style="margin:4px 0">• <strong>Alex Hormozi</strong> — <a href="https://youtube.com/watch?v=w6zEwLMV5Rg" target="_blank">Quick Way To Get Your First 10 Customers</a> <span style="opacity:0.6">(2 tactics)</span></div><div style="margin:4px 0">• <strong>Starter Story</strong> — <a href="https://youtube.com/watch?v=NvtsM8Nk72c" target="_blank">How I Built It: $23K/month micro-saas</a> <span style="opacity:0.6">(2 tactics)</span></div><div style="margin:4px 0">• <strong>Starter Story</strong> — <a href="https://youtube.com/watch?v=yIPteczUjFY" target="_blank">Why building in public is so important</a> <span style="opacity:0.6">(1 tactics)</span></div><div style="margin:4px 0">• <strong>Adonis Media</strong> — <a href="https://youtube.com/watch?v=9ID5V12aetI" target="_blank">Build in Public</a> <span style="opacity:0.6">(1 tactics)</span></div><div style="margin:4px 0">• <strong>Upsworth</strong> — <a href="https://youtube.com/watch?v=km5efnE81TY" target="_blank">The $410M Marketing Psychology Case Study</a> <span style="opacity:0.6">(1 tactics)</span></div>      </div>
+    </details>
+  </section>
+</div>
+
+<script>
+// Frequency chart
+const chartData = {"labels": ["seo content", "community led growth", "twitter x organic", "distribution first", "cold email", "referral loop", "anti persona", "case studies testimonials", "positioning", "pain point messaging", "psychology storytelling", "build in public", "facebook google ads", "shorts tiktok", "founder personal brand", "linkedin organic", "newsletter", "outcome selling", "reddit marketing", "partnerships"], "creator_counts": [18, 13, 12, 8, 10, 9, 8, 8, 8, 8, 8, 7, 7, 6, 5, 6, 6, 6, 6, 5], "commenter_counts": [2, 3, 1, 5, 0, 0, 1, 1, 1, 0, 0, 1, 0, 1, 3, 0, 0, 0, 0, 1], "colors": ["#3b82f6", "#10b981", "#f59e0b", "#84cc16", "#ef4444", "#06b6d4", "#84cc16", "#f97316", "#84cc16", "#84cc16", "#a855f7", "#14b8a6", "#ec4899", "#f59e0b", "#14b8a6", "#f59e0b", "#f59e0b", "#84cc16", "#f59e0b", "#8b5cf6"], "categories": ["seo", "community", "content", "positioning", "cold-outbound", "growth-loops", "positioning", "social-proof", "positioning", "positioning", "psychology", "build-in-public", "ads", "content", "build-in-public", "content", "content", "positioning", "content", "partnerships"]};
+new Chart(document.getElementById('frequencyChart').getContext('2d'), {
+  type: 'bar',
+  data: {
+    labels: chartData.labels,
+    datasets: [
+      {
+        label: 'Creators',
+        data: chartData.creator_counts,
+        backgroundColor: chartData.colors,
+        borderColor: chartData.colors,
+        borderWidth: 1,
+      },
+      {
+        label: 'Commenters (independent validation)',
+        data: chartData.commenter_counts,
+        backgroundColor: '#f97316cc',
+        borderColor: '#f97316',
+        borderWidth: 1,
+      },
+    ],
+  },
+  options: {
+    indexAxis: 'y',
+    responsive: true,
+    maintainAspectRatio: false,
+    plugins: {
+      legend: { labels: { color: getComputedStyle(document.body).getPropertyValue('--text') } },
+      tooltip: {
+        callbacks: {
+          afterLabel: (ctx) => 'category: ' + chartData.categories[ctx.dataIndex],
+        },
+      },
+    },
+    scales: {
+      x: {
+        stacked: true,
+        ticks: { color: getComputedStyle(document.body).getPropertyValue('--text-muted') },
+        grid: { color: getComputedStyle(document.body).getPropertyValue('--border') },
+      },
+      y: {
+        stacked: true,
+        ticks: { color: getComputedStyle(document.body).getPropertyValue('--text') },
+        grid: { display: false },
+      },
+    },
+  },
+});
+
+// Diversity chart
+const diversityData = {"labels": ["Starter Story", "TK Kader", "Ben B2B", "Greg Isenberg", "Adam Robinson", "Steven Irby", "Rob Walling", "Sam Dunning - Breaking B2B", "Ryan Wardell", "Brandon Burr", "Alex Becker Tech", "pookie", "The SaaS Pros Breakdown", "Favikon", "Oren Greenberg"], "counts": [5, 4, 2, 2, 2, 2, 2, 2, 2, 1, 1, 1, 1, 1, 1]};
+new Chart(document.getElementById('diversityChart').getContext('2d'), {
+  type: 'bar',
+  data: {
+    labels: diversityData.labels,
+    datasets: [{
+      label: '# videos in corpus',
+      data: diversityData.counts,
+      backgroundColor: '#7c3aedcc',
+      borderColor: '#7c3aed',
+      borderWidth: 1,
+    }],
+  },
+  options: {
+    indexAxis: 'y',
+    responsive: true,
+    maintainAspectRatio: false,
+    plugins: {
+      legend: { labels: { color: getComputedStyle(document.body).getPropertyValue('--text') } },
+    },
+    scales: {
+      x: { ticks: { color: getComputedStyle(document.body).getPropertyValue('--text-muted') }, grid: { color: getComputedStyle(document.body).getPropertyValue('--border') } },
+      y: { ticks: { color: getComputedStyle(document.body).getPropertyValue('--text') }, grid: { display: false } },
+    },
+  },
+});
+
+// Network graph
+const nodes = new vis.DataSet([{"id": "seo-content", "label": "seo content", "title": "seo-content \u2014 18 creators, 2 commenters", "color": "#3b82f6", "size": 60, "group": "seo"}, {"id": "community-led-growth", "label": "community led growth", "title": "community-led-growth \u2014 13 creators, 3 commenters", "color": "#10b981", "size": 60, "group": "community"}, {"id": "twitter-x-organic", "label": "twitter x organic", "title": "twitter-x-organic \u2014 12 creators, 1 commenters", "color": "#f59e0b", "size": 60, "group": "content"}, {"id": "distribution-first", "label": "distribution first", "title": "distribution-first \u2014 8 creators, 5 commenters", "color": "#84cc16", "size": 52, "group": "positioning"}, {"id": "cold-email", "label": "cold email", "title": "cold-email \u2014 10 creators, 0 commenters", "color": "#ef4444", "size": 50, "group": "cold-outbound"}, {"id": "referral-loop", "label": "referral loop", "title": "referral-loop \u2014 9 creators, 0 commenters", "color": "#06b6d4", "size": 46, "group": "growth-loops"}, {"id": "anti-persona", "label": "anti persona", "title": "anti-persona \u2014 8 creators, 1 commenters", "color": "#84cc16", "size": 44, "group": "positioning"}, {"id": "case-studies-testimonials", "label": "case studies testimonials", "title": "case-studies-testimonials \u2014 8 creators, 1 commenters", "color": "#f97316", "size": 44, "group": "social-proof"}, {"id": "positioning", "label": "positioning", "title": "positioning \u2014 8 creators, 1 commenters", "color": "#84cc16", "size": 44, "group": "positioning"}, {"id": "pain-point-messaging", "label": "pain point messaging", "title": "pain-point-messaging \u2014 8 creators, 0 commenters", "color": "#84cc16", "size": 42, "group": "positioning"}, {"id": "psychology-storytelling", "label": "psychology storytelling", "title": "psychology-storytelling \u2014 8 creators, 0 commenters", "color": "#a855f7", "size": 42, "group": "psychology"}, {"id": "build-in-public", "label": "build in public", "title": "build-in-public \u2014 7 creators, 1 commenters", "color": "#14b8a6", "size": 40, "group": "build-in-public"}, {"id": "facebook-google-ads", "label": "facebook google ads", "title": "facebook-google-ads \u2014 7 creators, 0 commenters", "color": "#ec4899", "size": 38, "group": "ads"}, {"id": "shorts-tiktok", "label": "shorts tiktok", "title": "shorts-tiktok \u2014 6 creators, 1 commenters", "color": "#f59e0b", "size": 36, "group": "content"}, {"id": "founder-personal-brand", "label": "founder personal brand", "title": "founder-personal-brand \u2014 5 creators, 3 commenters", "color": "#14b8a6", "size": 36, "group": "build-in-public"}, {"id": "linkedin-organic", "label": "linkedin organic", "title": "linkedin-organic \u2014 6 creators, 0 commenters", "color": "#f59e0b", "size": 34, "group": "content"}, {"id": "newsletter", "label": "newsletter", "title": "newsletter \u2014 6 creators, 0 commenters", "color": "#f59e0b", "size": 34, "group": "content"}, {"id": "outcome-selling", "label": "outcome selling", "title": "outcome-selling \u2014 6 creators, 0 commenters", "color": "#84cc16", "size": 34, "group": "positioning"}, {"id": "reddit-marketing", "label": "reddit marketing", "title": "reddit-marketing \u2014 6 creators, 0 commenters", "color": "#f59e0b", "size": 34, "group": "content"}, {"id": "partnerships", "label": "partnerships", "title": "partnerships \u2014 5 creators, 1 commenters", "color": "#8b5cf6", "size": 32, "group": "partnerships"}, {"id": "geo-llm-search", "label": "geo llm search", "title": "geo-llm-search \u2014 5 creators, 0 commenters", "color": "#3b82f6", "size": 30, "group": "seo"}, {"id": "waitlist", "label": "waitlist", "title": "waitlist \u2014 4 creators, 2 commenters", "color": "#eab308", "size": 30, "group": "launches"}, {"id": "pre-sell-validate", "label": "pre sell validate", "title": "pre-sell-validate \u2014 4 creators, 2 commenters", "color": "#6366f1", "size": 30, "group": "validation"}, {"id": "youtube-content", "label": "youtube content", "title": "youtube-content \u2014 5 creators, 0 commenters", "color": "#f59e0b", "size": 30, "group": "content"}, {"id": "trigger-based-outreach", "label": "trigger based outreach", "title": "trigger-based-outreach \u2014 4 creators, 1 commenters", "color": "#ef4444", "size": 28, "group": "cold-outbound"}, {"id": "podcast-marketing", "label": "podcast marketing", "title": "podcast-marketing \u2014 4 creators, 1 commenters", "color": "#f59e0b", "size": 28, "group": "content"}, {"id": "retargeting-ads", "label": "retargeting ads", "title": "retargeting-ads \u2014 4 creators, 0 commenters", "color": "#ec4899", "size": 26, "group": "ads"}, {"id": "appsumo-ltd", "label": "appsumo ltd", "title": "appsumo-ltd \u2014 3 creators, 0 commenters", "color": "#eab308", "size": 22, "group": "launches"}, {"id": "indie-hackers-community", "label": "indie hackers community", "title": "indie-hackers-community \u2014 3 creators, 0 commenters", "color": "#10b981", "size": 22, "group": "community"}, {"id": "psychology-scarcity", "label": "psychology scarcity", "title": "psychology-scarcity \u2014 3 creators, 0 commenters", "color": "#a855f7", "size": 22, "group": "psychology"}, {"id": "founder-led-sales", "label": "founder led sales", "title": "founder-led-sales \u2014 3 creators, 0 commenters", "color": "#dc2626", "size": 22, "group": "sales"}, {"id": "linkedin-dms", "label": "linkedin dms", "title": "linkedin-dms \u2014 3 creators, 0 commenters", "color": "#ef4444", "size": 22, "group": "cold-outbound"}, {"id": "competitor-alternative-pages", "label": "competitor alternative pages", "title": "competitor-alternative-pages \u2014 3 creators, 0 commenters", "color": "#3b82f6", "size": 22, "group": "seo"}, {"id": "lead-magnet-opt-in", "label": "lead magnet opt in", "title": "lead-magnet-opt-in \u2014 2 creators, 1 commenters", "color": "#06b6d4", "size": 20, "group": "growth-loops"}, {"id": "linkedin-ads", "label": "linkedin ads", "title": "linkedin-ads \u2014 2 creators, 1 commenters", "color": "#ec4899", "size": 20, "group": "ads"}, {"id": "review-sites-g2", "label": "review sites g2", "title": "review-sites-g2 \u2014 2 creators, 1 commenters", "color": "#f97316", "size": 20, "group": "social-proof"}, {"id": "loom-video-outreach", "label": "loom video outreach", "title": "loom-video-outreach \u2014 2 creators, 1 commenters", "color": "#ef4444", "size": 20, "group": "cold-outbound"}, {"id": "visitor-identification", "label": "visitor identification", "title": "visitor-identification \u2014 2 creators, 0 commenters", "color": "#ef4444", "size": 18, "group": "cold-outbound"}, {"id": "interview-customers", "label": "interview customers", "title": "interview-customers \u2014 2 creators, 0 commenters", "color": "#6366f1", "size": 18, "group": "validation"}, {"id": "freemium", "label": "freemium", "title": "freemium \u2014 2 creators, 0 commenters", "color": "#06b6d4", "size": 18, "group": "growth-loops"}, {"id": "events-conferences", "label": "events conferences", "title": "events-conferences \u2014 2 creators, 0 commenters", "color": "#10b981", "size": 18, "group": "community"}, {"id": "product-hunt-launch", "label": "product hunt launch", "title": "product-hunt-launch \u2014 2 creators, 0 commenters", "color": "#eab308", "size": 18, "group": "launches"}, {"id": "welcome-email-sequence", "label": "welcome email sequence", "title": "welcome-email-sequence \u2014 2 creators, 0 commenters", "color": "#06b6d4", "size": 18, "group": "growth-loops"}, {"id": "direct-mail", "label": "direct mail", "title": "direct-mail \u2014 2 creators, 0 commenters", "color": "#ef4444", "size": 18, "group": "cold-outbound"}, {"id": "bing-microsoft-ads", "label": "bing microsoft ads", "title": "bing-microsoft-ads \u2014 2 creators, 0 commenters", "color": "#ec4899", "size": 18, "group": "ads"}, {"id": "open-source-release", "label": "open source release", "title": "open-source-release \u2014 2 creators, 0 commenters", "color": "#06b6d4", "size": 18, "group": "growth-loops"}, {"id": "data-moat", "label": "data moat", "title": "data-moat \u2014 2 creators, 0 commenters", "color": "#84cc16", "size": 18, "group": "positioning"}, {"id": "in-person-events-meetups", "label": "in person events meetups", "title": "in-person-events-meetups \u2014 2 creators, 0 commenters", "color": "#10b981", "size": 18, "group": "community"}, {"id": "psychology-curiosity", "label": "psychology curiosity", "title": "psychology-curiosity \u2014 2 creators, 0 commenters", "color": "#a855f7", "size": 18, "group": "psychology"}, {"id": "user-generated-content", "label": "user generated content", "title": "user-generated-content \u2014 2 creators, 0 commenters", "color": "#ec4899", "size": 18, "group": "ads"}, {"id": "psychology-exclusivity", "label": "psychology exclusivity", "title": "psychology-exclusivity \u2014 1 creators, 1 commenters", "color": "#a855f7", "size": 16, "group": "psychology"}, {"id": "abm-account-based", "label": "abm account based", "title": "abm-account-based \u2014 1 creators, 1 commenters", "color": "#dc2626", "size": 16, "group": "sales"}, {"id": "iteration-sprints", "label": "iteration sprints", "title": "iteration-sprints \u2014 1 creators, 0 commenters", "color": "#06b6d4", "size": 14, "group": "growth-loops"}, {"id": "linkedin-creator-sponsorship", "label": "linkedin creator sponsorship", "title": "linkedin-creator-sponsorship \u2014 1 creators, 0 commenters", "color": "#ec4899", "size": 14, "group": "ads"}, {"id": "channel-focus", "label": "channel focus", "title": "channel-focus \u2014 1 creators, 0 commenters", "color": "#84cc16", "size": 14, "group": "positioning"}, {"id": "delayed-billing-roi", "label": "delayed billing roi", "title": "delayed-billing-roi \u2014 1 creators, 0 commenters", "color": "#dc2626", "size": 14, "group": "sales"}, {"id": "guarantee-risk-reversal", "label": "guarantee risk reversal", "title": "guarantee-risk-reversal \u2014 1 creators, 0 commenters", "color": "#a855f7", "size": 14, "group": "psychology"}, {"id": "implement-user-feedback", "label": "implement user feedback", "title": "implement-user-feedback \u2014 1 creators, 0 commenters", "color": "#10b981", "size": 14, "group": "community"}, {"id": "workflow-mapping", "label": "workflow mapping", "title": "workflow-mapping \u2014 1 creators, 0 commenters", "color": "#6366f1", "size": 14, "group": "validation"}, {"id": "quantify-pain-in-dollars", "label": "quantify pain in dollars", "title": "quantify-pain-in-dollars \u2014 1 creators, 0 commenters", "color": "#84cc16", "size": 14, "group": "positioning"}, {"id": "do-things-that-dont-scale", "label": "do things that dont scale", "title": "do-things-that-dont-scale \u2014 1 creators, 0 commenters", "color": "#dc2626", "size": 14, "group": "sales"}, {"id": "high-touch-onboarding", "label": "high touch onboarding", "title": "high-touch-onboarding \u2014 1 creators, 0 commenters", "color": "#dc2626", "size": 14, "group": "sales"}, {"id": "video-case-studies", "label": "video case studies", "title": "video-case-studies \u2014 1 creators, 0 commenters", "color": "#f97316", "size": 14, "group": "social-proof"}, {"id": "cohort-launch", "label": "cohort launch", "title": "cohort-launch \u2014 1 creators, 0 commenters", "color": "#10b981", "size": 14, "group": "community"}, {"id": "video-demo-on-site", "label": "video demo on site", "title": "video-demo-on-site \u2014 1 creators, 0 commenters", "color": "#f97316", "size": 14, "group": "social-proof"}, {"id": "free-tools", "label": "free tools", "title": "free-tools \u2014 1 creators, 0 commenters", "color": "#06b6d4", "size": 14, "group": "growth-loops"}, {"id": "narrow-niche-subniche", "label": "narrow niche subniche", "title": "narrow-niche-subniche \u2014 1 creators, 0 commenters", "color": "#84cc16", "size": 14, "group": "positioning"}, {"id": "ai-search-optimization", "label": "ai search optimization", "title": "ai-search-optimization \u2014 1 creators, 0 commenters", "color": "#3b82f6", "size": 14, "group": "seo"}, {"id": "stop-doing-framing", "label": "stop doing framing", "title": "stop-doing-framing \u2014 0 creators, 1 commenters", "color": "#84cc16", "size": 12, "group": "positioning"}]);
+const edges = new vis.DataSet([{"from": "anti-persona", "to": "cold-email", "value": 4, "title": "co-occurs 4x"}, {"from": "anti-persona", "to": "seo-content", "value": 3, "title": "co-occurs 3x"}, {"from": "cold-email", "to": "linkedin-organic", "value": 3, "title": "co-occurs 3x"}, {"from": "cold-email", "to": "seo-content", "value": 7, "title": "co-occurs 7x"}, {"from": "linkedin-organic", "to": "seo-content", "value": 6, "title": "co-occurs 6x"}, {"from": "founder-personal-brand", "to": "seo-content", "value": 4, "title": "co-occurs 4x"}, {"from": "newsletter", "to": "seo-content", "value": 3, "title": "co-occurs 3x"}, {"from": "pain-point-messaging", "to": "positioning", "value": 3, "title": "co-occurs 3x"}, {"from": "positioning", "to": "seo-content", "value": 3, "title": "co-occurs 3x"}, {"from": "cold-email", "to": "psychology-storytelling", "value": 3, "title": "co-occurs 3x"}, {"from": "seo-content", "to": "trigger-based-outreach", "value": 4, "title": "co-occurs 4x"}, {"from": "seo-content", "to": "youtube-content", "value": 3, "title": "co-occurs 3x"}, {"from": "build-in-public", "to": "distribution-first", "value": 4, "title": "co-occurs 4x"}, {"from": "build-in-public", "to": "twitter-x-organic", "value": 3, "title": "co-occurs 3x"}, {"from": "distribution-first", "to": "twitter-x-organic", "value": 3, "title": "co-occurs 3x"}, {"from": "community-led-growth", "to": "referral-loop", "value": 4, "title": "co-occurs 4x"}, {"from": "community-led-growth", "to": "distribution-first", "value": 3, "title": "co-occurs 3x"}, {"from": "community-led-growth", "to": "newsletter", "value": 3, "title": "co-occurs 3x"}, {"from": "anti-persona", "to": "referral-loop", "value": 4, "title": "co-occurs 4x"}, {"from": "build-in-public", "to": "seo-content", "value": 3, "title": "co-occurs 3x"}, {"from": "cold-email", "to": "referral-loop", "value": 3, "title": "co-occurs 3x"}, {"from": "linkedin-dms", "to": "seo-content", "value": 3, "title": "co-occurs 3x"}, {"from": "referral-loop", "to": "seo-content", "value": 5, "title": "co-occurs 5x"}, {"from": "seo-content", "to": "visitor-identification", "value": 3, "title": "co-occurs 3x"}, {"from": "cold-email", "to": "partnerships", "value": 3, "title": "co-occurs 3x"}, {"from": "distribution-first", "to": "referral-loop", "value": 3, "title": "co-occurs 3x"}, {"from": "distribution-first", "to": "seo-content", "value": 4, "title": "co-occurs 4x"}, {"from": "partnerships", "to": "seo-content", "value": 5, "title": "co-occurs 5x"}, {"from": "community-led-growth", "to": "seo-content", "value": 4, "title": "co-occurs 4x"}, {"from": "seo-content", "to": "twitter-x-organic", "value": 4, "title": "co-occurs 4x"}, {"from": "reddit-marketing", "to": "seo-content", "value": 3, "title": "co-occurs 3x"}, {"from": "geo-llm-search", "to": "seo-content", "value": 4, "title": "co-occurs 4x"}, {"from": "podcast-marketing", "to": "seo-content", "value": 3, "title": "co-occurs 3x"}, {"from": "geo-llm-search", "to": "shorts-tiktok", "value": 3, "title": "co-occurs 3x"}, {"from": "seo-content", "to": "shorts-tiktok", "value": 3, "title": "co-occurs 3x"}, {"from": "anti-persona", "to": "pain-point-messaging", "value": 3, "title": "co-occurs 3x"}, {"from": "anti-persona", "to": "waitlist", "value": 3, "title": "co-occurs 3x"}, {"from": "cold-email", "to": "founder-personal-brand", "value": 3, "title": "co-occurs 3x"}, {"from": "cold-email", "to": "loom-video-outreach", "value": 3, "title": "co-occurs 3x"}, {"from": "cold-email", "to": "twitter-x-organic", "value": 3, "title": "co-occurs 3x"}, {"from": "founder-personal-brand", "to": "twitter-x-organic", "value": 3, "title": "co-occurs 3x"}, {"from": "anti-persona", "to": "psychology-storytelling", "value": 4, "title": "co-occurs 4x"}, {"from": "community-led-growth", "to": "reddit-marketing", "value": 3, "title": "co-occurs 3x"}]);
+const container = document.getElementById('network');
+const networkData = { nodes, edges };
+const options = {
+  nodes: {
+    shape: 'dot',
+    font: { color: getComputedStyle(document.body).getPropertyValue('--text'), size: 12 },
+    borderWidth: 0,
+  },
+  edges: {
+    color: { color: getComputedStyle(document.body).getPropertyValue('--border'), opacity: 0.6 },
+    smooth: { type: 'continuous' },
+    scaling: { min: 1, max: 6 },
+  },
+  physics: {
+    barnesHut: { gravitationalConstant: -8000, centralGravity: 0.2, springLength: 150, springConstant: 0.04 },
+    stabilization: { iterations: 200 },
+  },
+  interaction: { hover: true, tooltipDelay: 100 },
+};
+new vis.Network(container, networkData, options);
+</script>
+</body>
+</html>

@@ -1,0 +1,29 @@
+{
+  "topic": "Test topic",
+  "slug": "test-topic",
+  "date": "2026-01-01",
+  "axis_stage": {
+    "name": "Stage",
+    "description": "Test stages",
+    "values": ["alpha", "beta", "gamma", "general"],
+    "ordered": true
+  },
+  "axis_category": {
+    "name": "Category",
+    "description": "Test categories",
+    "values": ["red", "green", "blue"],
+    "ordered": false
+  },
+  "search_query_seeds": [
+    "test query 1",
+    "test query 2",
+    "test query 3",
+    "test query 4",
+    "test query 5",
+    "test query 6",
+    "test query 7",
+    "test query 8",
+    "test query 9",
+    "test query 10"
+  ]
+}

@@ -1,0 +1,4 @@
+# Dev dependencies for testing + linting
+# Runtime has zero pip dependencies — the scripts only use stdlib.
+pytest>=7.0
+ruff>=0.6

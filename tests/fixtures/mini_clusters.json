@@ -1,0 +1,37 @@
+{
+  "topic": "Test topic",
+  "clusters": [
+    {
+      "id": "cold-email",
+      "label": "Cold email outreach",
+      "description": "Sending cold emails with personalized openers",
+      "category": "red",
+      "primary_stage": "beta",
+      "member_tactic_ids": ["vid001#0", "vid002#0"]
+    },
+    {
+      "id": "build-in-public",
+      "label": "Build in public",
+      "description": "Sharing progress publicly",
+      "category": "green",
+      "primary_stage": "alpha",
+      "member_tactic_ids": ["vid001#1"]
+    },
+    {
+      "id": "specificity-in-messaging",
+      "label": "Specificity in messaging",
+      "description": "Use concrete numbers and dates",
+      "category": "red",
+      "primary_stage": "general",
+      "member_tactic_ids": ["vid001#2"]
+    }
+  ],
+  "new_categories": [],
+  "stats": {
+    "total_raw_tactics": 4,
+    "total_assigned": 4,
+    "total_clusters": 3,
+    "largest_cluster": "cold-email (2 members)",
+    "smallest_cluster": "build-in-public (1 member)"
+  }
+}

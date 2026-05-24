@@ -1,0 +1,64 @@
+[
+  {
+    "videoId": "vid001",
+    "title": "Test video 1",
+    "channel": "ChannelA",
+    "url": "https://youtube.com/watch?v=vid001",
+    "tactics": [
+      {
+        "text": "Use cold email with personalized openers",
+        "source": "creator",
+        "stage": "beta",
+        "category": "red",
+        "confidence": "high",
+        "claim_type": "actionable",
+        "quote": "Cold email works when you start with a specific compliment"
+      },
+      {
+        "text": "Build in public daily",
+        "source": "creator",
+        "stage": "alpha",
+        "category": "green",
+        "confidence": "high",
+        "claim_type": "actionable",
+        "quote": "I post daily updates and it changed everything"
+      },
+      {
+        "text": "Reply with specific numbers, not vague claims",
+        "source": "commenter",
+        "stage": "general",
+        "category": "red",
+        "confidence": "medium",
+        "claim_type": "warning",
+        "quote": "saying 'soon' lost me deals; 'by Friday at 3pm' closed them"
+      }
+    ],
+    "skipped": false,
+    "skip_reason": null
+  },
+  {
+    "videoId": "vid002",
+    "title": "Test video 2",
+    "channel": "ChannelB",
+    "url": "https://youtube.com/watch?v=vid002",
+    "tactics": [
+      {
+        "text": "Use cold email with templates",
+        "source": "creator",
+        "stage": "beta",
+        "category": "red",
+        "confidence": "medium",
+        "claim_type": "actionable",
+        "quote": "Templates save time but customize the opener"
+      }
+    ],
+    "skipped": false,
+    "skip_reason": null
+  },
+  {
+    "videoId": "vid003",
+    "title": "Skipped video",
+    "skipped": true,
+    "skip_reason": "no transcript"
+  }
+]

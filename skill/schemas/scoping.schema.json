@@ -1,0 +1,48 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "Scoping",
+  "type": "object",
+  "required": ["topic", "slug", "axis_stage", "axis_category", "search_query_seeds"],
+  "properties": {
+    "topic": { "type": "string", "minLength": 3 },
+    "slug": { "type": "string", "pattern": "^[a-z0-9-]+$" },
+    "axis_stage": {
+      "type": "object",
+      "required": ["name", "values", "ordered"],
+      "properties": {
+        "name": { "type": "string" },
+        "description": { "type": "string" },
+        "values": {
+          "type": "array",
+          "minItems": 1,
+          "items": { "type": "string" }
+        },
+        "ordered": { "type": "boolean" }
+      }
+    },
+    "axis_category": {
+      "type": "object",
+      "required": ["name", "values"],
+      "properties": {
+        "name": { "type": "string" },
+        "description": { "type": "string" },
+        "values": {
+          "type": "array",
+          "minItems": 3,
+          "items": { "type": "string" }
+        },
+        "ordered": { "type": "boolean" }
+      }
+    },
+    "search_query_seeds": {
+      "type": "array",
+      "minItems": 10,
+      "maxItems": 20,
+      "items": { "type": "string", "minLength": 3 }
+    },
+    "expected_creator_archetypes": {
+      "type": "array",
+      "items": { "type": "string" }
+    }
+  }
+}
